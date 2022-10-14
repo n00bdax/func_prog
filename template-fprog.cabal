@@ -1,0 +1,63 @@
+cabal-version: 2.2
+name:          template-fprog
+version:       0.3.0.0
+build-type:    Simple
+
+library
+  -- Modules exported by the library.
+  exposed-modules:
+    Angabe1
+    Angabe2
+    Angabe3
+    Angabe4
+    Angabe5
+    Angabe6
+    Angabe7
+
+  build-depends:
+    , array       >=0.5.2.0
+    , base        >=4.10
+    , QuickCheck  >=2.14
+
+  -- These are warnings that are generally useful for this exercise
+  ghc-options:
+    -Wall -Wmissing-methods -Wmissing-signatures -Wname-shadowing
+
+  -- Directories containing source files.
+  hs-source-dirs:   src
+
+  -- Base language which the package is written in.
+  default-language: Haskell2010
+
+test-suite fprog-tests
+
+  -- The interface type and version of the test suite.
+  type:             exitcode-stdio-1.0
+
+  -- Directories containing source files.
+  hs-source-dirs:   test
+
+  -- The entrypoint to the test suite.
+  main-is:          Main.hs
+
+  -- If you want to add more test-files, add the modules here:
+  other-modules:
+    TestSuite1
+    TestSuite2
+    TestSuite3
+    TestSuite4
+    TestSuite5
+    TestSuite6
+    TestSuite7
+
+  ghc-options:      -Wall
+  build-depends:
+    , array
+    , base
+    , QuickCheck
+    , tasty             >=1.4.2
+    , tasty-hunit
+    , tasty-quickcheck
+    , template-fprog
+  -- Base language which the package is written in.
+  default-language: Haskell2010
