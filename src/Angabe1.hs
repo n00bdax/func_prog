@@ -40,7 +40,7 @@ extractChars s h
   | otherwise = extractChars (tail s) (histAdd (head s) h)
 
 haeufigkeit :: Zeichenreihe -> Histogramm
-haeufigkeit s = extractChars s []::Histogramm;
+haeufigkeit s = extractChars s []::Histogramm
 
 {- Knapp, aber gut nachvollziehbar geht haufigkeit folgendermassen vor:
    
