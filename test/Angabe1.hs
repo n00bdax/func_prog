@@ -123,29 +123,28 @@ auf das zuletzt betrachtete Element addiert
 
 -}
 
--- Test Variables
---
---masses :: Gewichtsverzeichnis
---masses = [('m',1),('a',2),('s',3),('s',4),('e',5),('s',6)]
---
---masseses :: Gewichtsverzeichnis
---masseses = masses ++ masses
---
---pl::Gewichtsverzeichnis
---pl = [('a',2),('b',1),('c',3),('d',2),('e',3)]
---
---mss::Gewichtsverzeichnis
---mss=[('a',0),('l',1)]
---
---mnn::Gewichtsverzeichnis
---mnn= [('a',2),('b',1),('c',3),('d',2),('e',3),('a',2),('b',1),('c',3),('d',2),('e',3)]
---
---ad14 :: Gewichtsverzeichnis
---ad14 = [(a,b)|b<-[1..4],a<-['a'..'d']]
---
---s1 :: Zeichenreihe
---s1 = "The quick brown fox jumps over the lazy dog"::Zeichenreihe
---
---s2 :: Zeichenreihe
---s2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." :: Zeichenreihe
+
+masses :: Gewichtsverzeichnis
+masses = [('m',1),('a',2),('s',3),('s',4),('e',5),('s',6)]
+
+masseses :: Gewichtsverzeichnis
+masseses = masses ++ masses
+
+pl::Gewichtsverzeichnis
+pl = [('a',2),('b',1),('c',3),('d',2),('e',3)]
+
+mss::Gewichtsverzeichnis
+mss=[('a',0),('l',1)]
+
+mnn::Gewichtsverzeichnis
+mnn= [('a',2),('b',1),('c',3),('d',2),('e',3),('a',2),('b',1),('c',3),('d',2),('e',3)]
+
+ad14 :: Gewichtsverzeichnis
+ad14 = [(a,b)|b<-[1..4],a<-['a'..'d']]
+
+s1 :: Zeichenreihe
+s1 = "The quick brown fox jumps over the lazy dog"::Zeichenreihe
+
+s2 :: Zeichenreihe
+s2 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." :: Zeichenreihe
 
