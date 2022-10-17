@@ -72,7 +72,7 @@ gewichtTests =
     [ testCase "gewicht Test a" $
         gewicht "anything" [('m',1),('a',2),('s',3),('s',4),('e',5),('s',6)] @?= -1,
       testCase "gewicht Test b" $
-        gewicht " " [('x',3),('x',4)] @?= -1,
+        gewicht " " [('x',3),('x',4)] + gewicht " " [] @?= -1,
       testCase "gewicht Test c" $
         gewicht "Paparazzipizzeria" [('a',0),('l',1)] @?= 0,
       testCase "gewicht Test d" $
