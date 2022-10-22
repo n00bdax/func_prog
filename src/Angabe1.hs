@@ -43,18 +43,35 @@ histAdd c h
   | otherwise = head h : histAdd c (tail h)
 -}
 
-haeufigkeit :: Zeichenreihe -> Histogramm
-haeufigkeit s =  extractChars s []::Histogramm
-  where
-  extractChars :: Zeichenreihe -> Histogramm -> Histogramm
-  extractChars [] h = h
-  extractChars remaining h = extractChars (tail remaining) (histAdd (head remaining) h)
+--haeufigkeit :: Zeichenreihe -> Histogramm
+--haeufigkeit s =  extractChars s []::Histogramm
+--  where
+--  extractChars :: Zeichenreihe -> Histogramm -> Histogramm
+--  extractChars [] h = h
+--  extractChars remaining h = extractChars (tail remaining) (histAdd (head remaining) h)
+--
+--  histAdd :: Zeichen -> Histogramm -> Histogramm
+--  histAdd c h
+--    | null h = [(c,1)]
+--    | c == fst (head h) = (fst (head h) ,snd (head h) +1):tail h
+--    | otherwise = head h : histAdd c (tail h)
 
-  histAdd :: Zeichen -> Histogramm -> Histogramm
-  histAdd c h
-    | null h = [(c,1)]
-    | c == fst (head h) = (fst (head h) ,snd (head h) +1):tail h
-    | otherwise = head h : histAdd c (tail h)
+
+
+
+haeufigkeit :: Zeichenreihe -> Histogramm
+haeufigkeit str = reverse (haeufigkeit' str)
+  where
+    haeufigkeit' :: Zeichenreihe -> Histogramm
+    haeufigkeit' [] = []
+    haeufigkeit' zeichenreihe = ifVorhanden (head zeichenreihe) (haeufigkeit' (tail zeichenreihe))
+    
+    
+    ifVorhanden :: Zeichen -> Histogramm -> Histogramm
+    ifVorhanden zeichen [] = [(zeichen, 1)]
+    ifVorhanden zeichen hist
+      | fst (head hist) == zeichen = (tail hist) ++ [(zeichen,snd (head hist) + 1)]
+      | otherwise = [head hist] ++ ifVorhanden zeichen (tail hist)
 
 
 {- Knapp, aber gut nachvollziehbar geht haufigkeit folgendermassen vor:
