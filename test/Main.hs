@@ -14,6 +14,7 @@ import qualified TestSuite4
 import qualified TestSuite5
 import qualified TestSuite6
 import qualified TestSuite7
+import qualified Angabe1_TestSuite1
 
 main :: IO ()
 main = defaultMain tests
@@ -27,4 +28,5 @@ tests = testGroup "Fprog Tests"
     , TestSuite5.spec
     , TestSuite6.spec
     , TestSuite7.spec
+    , Angabe1_TestSuite1.spec
     ]

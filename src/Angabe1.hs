@@ -146,13 +146,14 @@ fixRegister a b
 
 
 korrigiere :: Gewichtsverzeichnis -> Gewichtsverzeichnis
-korrigiere g = fixRegister [head g] (tail g)
+korrigiere [] = []
+korrigiere (x:xs) = fixRegister [x] xs
   where
   fixRegister :: Gewichtsverzeichnis -> Gewichtsverzeichnis -> Gewichtsverzeichnis
-  fixRegister a b
-    | null b = a
-    | fst (head b) `elem` ([fst x | x<-a]) = fixRegister a (tail b)
-    | otherwise = fixRegister (a++ [head b]) (tail b)
+  fixRegister a [] = a
+  fixRegister a (b:bs)
+    | fst b `elem` ([fst n | n<-a]) = fixRegister a bs
+    | otherwise = fixRegister (a++ [b]) bs
 
 {- Knapp, aber gut nachvollziehbar geht gewicht folgendermassen vor:
 
@@ -186,21 +187,21 @@ sumUp a b = [(fst a, snd a + sum[snd x | x <- b , fst x == fst a])]
 
 
 korrigiere' :: Gewichtsverzeichnis -> Gewichtsverzeichnis
-korrigiere' g =  fixRegister'Deep [head g] (tail g)
+korrigiere' [] = []
+korrigiere' (x:xs) =  fixRegister'Deep [x] xs
   where
-  fixRegister' a b
-    | null b = a
-    | fst (head b) `elem` ([fst x | x<-a]) = fixRegister' a (tail b)
-    | otherwise = fixRegister'Deep (a ++ [head b]) (tail b)
+  fixRegister' a [] = a
+  fixRegister' a (b:bs)
+    | fst b `elem` ([fst n | n<-a]) = fixRegister' a bs
+    | otherwise = fixRegister'Deep (a ++ [b]) bs
 
   fixRegister'Deep:: Gewichtsverzeichnis -> Gewichtsverzeichnis -> Gewichtsverzeichnis
-  fixRegister'Deep a b
-    | null b = a
-    | otherwise = fixRegister' (init a ++ sumUp (last a) b) b
+  fixRegister'Deep a [] = a
+  fixRegister'Deep a b = fixRegister' (init a ++ sumUp (last a) b) b
   fixRegister' :: Gewichtsverzeichnis -> Gewichtsverzeichnis -> Gewichtsverzeichnis
 
   sumUp :: (Zeichen, Haeufigkeit) -> Gewichtsverzeichnis -> Gewichtsverzeichnis
-  sumUp a b = [(fst a, snd a + sum[snd x | x <- b , fst x == fst a])]
+  sumUp a b = [(fst a, snd a + sum[snd n | n <- b , fst n == fst a])]
 
 {- Knapp, aber gut nachvollziehbar geht gewicht folgendermassen vor:
 
