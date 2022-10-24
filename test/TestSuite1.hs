@@ -43,7 +43,7 @@ import Data.Ord
 spec :: TestTree
 spec =
   testGroup
-    "TestSuite1 Spec"
+    "Angabe1"
     [ haeufigkeitTests,
       gewichtTests,
       korrigiereTests,

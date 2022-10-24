@@ -30,40 +30,86 @@ type Loswert    = Lotterielos
 type Auswertung = Ordering
 
 
--- Aufgabe A.1
+--debug variables
+{-
+l1::Liste
+l1= Kopf Freilos(Kopf Treffer (Kopf Treffer (Kopf Niete (Schluss Niete))))
+-- 2 Treffer, 1 Freilos, 2 Niete
 
-analysiere :: Liste -> Loswert -> Loswert -> Auswertung
+l2::Liste
+l2= Kopf Freilos(Kopf Treffer (Kopf Treffer (Kopf Niete (Kopf Niete(Kopf Treffer (Kopf Treffer (Kopf Niete (Schluss Niete))))))))   
+-- 4 Treffer, 1 Freilos, 4 Niete
 
-{- Knapp, aber gut nachvollziehbar geht analysiere folgendermassen vor:
-   ...
+l3 :: Liste
+l3  = Schluss Freilos
+-- 1 Niete
+
+b1::Baum
+b1= Gabel (Blatt Treffer) Niete (Gabel (Blatt Treffer) Treffer (Blatt Freilos))
+-- 3 Treffer, 1 Freilos, 1 Niete
+
+b2::Baum
+b2= Gabel (Blatt Niete) Niete (Gabel (Blatt Niete) Treffer (Gabel (Blatt Freilos) Freilos (Blatt Freilos)))
+-- 1 Treffer, 3 Freilos, 3 Niete
+
+b3 ::Baum
+b3= Blatt Niete
+--1 Niete
+
+l1'::Liste'
+l1' = Kopf' b1(Schluss' b1)
+-- 6 Treffer, 2 Freilos, 2 Niete
+
+l2'::Liste'
+l2' = Kopf' b1(Kopf' b3 (Schluss' b3))
+-- 3 Treffer, 1 Freilos, 3 Niete
+
+b1'::Baum'
+b1' = Blatt' l1
+-- 2 Treffer, 1 Freilos, 2 Niete
+
+b2'::Baum'
+b2' = Gabel' (Blatt' l1) l2 (Gabel' (Blatt' l2) l2 (Blatt' l1))
+-- 14 Treffer, 1 Freilos, 14 Niete
 -}
 
+-- Aufgabe A.1
+analysiere :: Liste -> Loswert -> Loswert -> Auswertung
+analysiere l lw lw' = compare (cL l lw)(cL l lw')
 
+cL :: Liste -> Lotterielos -> Int
+cL (Schluss x) val = fromEnum (x==val)
+cL (Kopf x xs) val = cL xs val + fromEnum (x==val)
 
 -- Aufgabe A.2
-
 analysiere' :: Baum -> Loswert -> Loswert -> Auswertung
+analysiere' b lw lw' = compare (cT b lw)(cT b lw')
 
-{- Knapp, aber gut nachvollziehbar geht analysiere' folgendermassen vor:
-   ...
--}
-
-
+cL' :: Liste' -> Lotterielos -> Int
+cL' (Schluss' x) val = cT x val
+cL' (Kopf' x xs) val = cL' xs val + cT x val
 
 -- Aufgabe A.3
-
 analysiere'' :: Liste' -> Loswert -> Loswert -> Auswertung
+analysiere'' l lw lw' = compare (cL' l lw)(cL' l lw')
 
-{- Knapp, aber gut nachvollziehbar geht analysiere'' folgendermassen vor:
-   ...
--}
-
-
+cT :: Baum -> Lotterielos -> Int
+cT (Blatt x) val = fromEnum (x==val)
+cT (Gabel a x b) val = cT a val +  fromEnum (x==val) + cT b val
 
 -- Aufgabe A.4
-
 analysiere''' :: Baum' -> Loswert -> Loswert -> Auswertung
+analysiere''' b lw lw' = compare (cT' b lw)(cT' b lw')
 
-{- Knapp, aber gut nachvollziehbar geht analysiere''' folgendermassen vor:
-   ...
+cT' :: Baum' -> Lotterielos -> Int
+cT' (Blatt' x) val = cL x val
+cT' (Gabel' a x b) val = cT' a val + cL x val + cT' b val
+
+{-
+analysiere* vergleicht Werte
+cL berechnet Übereinstimmungen in einer linked list mit Variablen
+cT berechnet Übereinstimmungen in einem tree mit Variablen
+cL' summiert Übereinstimmungen in einer linked list aus trees (calls cT)
+cT' summiert Übereinstimmungen in einem tree aus linked lists (calls cL)
+
 -}
