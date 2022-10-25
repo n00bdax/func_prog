@@ -75,7 +75,9 @@ b2' = Gabel' (Blatt' l1) l2 (Gabel' (Blatt' l2) l2 (Blatt' l1))
 
 -- Aufgabe A.1
 analysiere :: Liste -> Loswert -> Loswert -> Auswertung
-analysiere l lw lw' = compare (cL l lw)(cL l lw')
+analysiere l lw lw' 
+  | lw == lw' = EQ 
+  | otherwise = compare (cL l lw)(cL l lw')
 
 cL :: Liste -> Lotterielos -> Int
 cL (Schluss x) val = fromEnum (x==val)
@@ -83,7 +85,9 @@ cL (Kopf x xs) val = cL xs val + fromEnum (x==val)
 
 -- Aufgabe A.2
 analysiere' :: Baum -> Loswert -> Loswert -> Auswertung
-analysiere' b lw lw' = compare (cT b lw)(cT b lw')
+analysiere' b lw lw'  
+  | lw == lw' = EQ 
+  | otherwise = compare (cT b lw)(cT b lw')
 
 cL' :: Liste' -> Lotterielos -> Int
 cL' (Schluss' x) val = cT x val
@@ -91,7 +95,9 @@ cL' (Kopf' x xs) val = cL' xs val + cT x val
 
 -- Aufgabe A.3
 analysiere'' :: Liste' -> Loswert -> Loswert -> Auswertung
-analysiere'' l lw lw' = compare (cL' l lw)(cL' l lw')
+analysiere'' l lw lw'  
+  | lw == lw' = EQ 
+  | otherwise = compare (cL' l lw)(cL' l lw')
 
 cT :: Baum -> Lotterielos -> Int
 cT (Blatt x) val = fromEnum (x==val)
@@ -99,7 +105,9 @@ cT (Gabel a x b) val = cT a val +  fromEnum (x==val) + cT b val
 
 -- Aufgabe A.4
 analysiere''' :: Baum' -> Loswert -> Loswert -> Auswertung
-analysiere''' b lw lw' = compare (cT' b lw)(cT' b lw')
+analysiere''' b lw lw'  
+  | lw == lw' = EQ 
+  | otherwise = compare (cT' b lw)(cT' b lw')
 
 cT' :: Baum' -> Lotterielos -> Int
 cT' (Blatt' x) val = cL x val
