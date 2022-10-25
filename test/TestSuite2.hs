@@ -51,7 +51,9 @@ analysiereTest =
             testCase "analysiere Test 3" $
                 analysiere (Kopf Niete (Kopf Treffer (Schluss Niete))) Treffer Treffer @?= EQ,
             testCase "analysiere Test 4" $
-                analysiere (Kopf Niete (Kopf Treffer (Kopf Treffer (Schluss Niete)))) Treffer Niete @?= EQ
+                analysiere (Kopf Niete (Kopf Treffer (Kopf Treffer (Schluss Niete)))) Treffer Niete @?= EQ,
+            testCase "analysiere test recursive" $
+                let a = Kopf Niete a in analysiere a Niete Niete @?= EQ
         ]
 
 analysiere'Test :: TestTree
@@ -74,8 +76,10 @@ analysiere'Test =
                 analysiere' (Gabel (Gabel (Gabel (Blatt Treffer) Treffer (Blatt Treffer)) Treffer (Blatt Niete)) Niete (Gabel (Blatt Niete) Treffer (Blatt Niete))) Niete Treffer @?= LT,
             testCase "analysiere' Test 7" $
                 analysiere' (Gabel (Gabel (Gabel (Blatt Treffer) Treffer (Blatt Treffer)) Treffer (Blatt Niete)) Niete (Gabel (Blatt Niete) Treffer (Blatt Niete))) Niete Niete @?= EQ,
-             testCase "analysiere' Test 8" $
-                analysiere' (Gabel (Gabel (Gabel (Blatt Treffer) Treffer (Blatt Freilos)) Treffer (Blatt Niete)) Niete (Gabel (Blatt Niete) Treffer (Blatt Niete))) Niete Treffer @?= EQ
+            testCase "analysiere' Test 8" $
+                analysiere' (Gabel (Gabel (Gabel (Blatt Treffer) Treffer (Blatt Freilos)) Treffer (Blatt Niete)) Niete (Gabel (Blatt Niete) Treffer (Blatt Niete))) Niete Treffer @?= EQ,
+            testCase "analysiere' test recursive" $
+                            let a = Gabel a Niete a in analysiere' a Niete Niete @?= EQ
         ]
 
 analysiere''Test :: TestTree
@@ -95,7 +99,9 @@ analysiere''Test =
             testCase "analysiere'' Test 5" $
                 analysiere'' (Kopf' (Gabel (Blatt Treffer) Niete (Blatt Niete)) (Kopf' (Blatt Treffer) (Schluss' (Gabel (Blatt Niete) Treffer (Blatt Niete))))) Freilos Treffer @?= LT,
             testCase "analysiere'' Test 6" $
-                analysiere'' (Kopf' (Gabel (Blatt Treffer) Niete (Blatt Niete)) (Kopf' (Blatt Treffer) (Schluss' (Gabel (Blatt Freilos) Treffer (Blatt Niete))))) Niete Treffer @?= EQ     
+                analysiere'' (Kopf' (Gabel (Blatt Treffer) Niete (Blatt Niete)) (Kopf' (Blatt Treffer) (Schluss' (Gabel (Blatt Freilos) Treffer (Blatt Niete))))) Niete Treffer @?= EQ,
+            testCase "analysiere'' test recursive" $
+                let a = Gabel a Niete a in analysiere'' (Schluss' a) Niete Niete @?= EQ
         ]
 
 analysiere'''Test :: TestTree
@@ -119,5 +125,7 @@ analysiere'''Test =
             testCase "analysiere''' Test 8" $
                 analysiere''' (Gabel' (Gabel' (Blatt' (Kopf Treffer (Schluss Niete))) (Schluss Niete) (Blatt' (Schluss Niete))) (Schluss Treffer) (Blatt' (Schluss Niete))) Niete Freilos @?= GT,
             testCase "analysiere''' Test 9" $
-                analysiere''' (Gabel' (Gabel' (Blatt' (Kopf Treffer (Schluss Niete))) (Schluss Freilos) (Blatt' (Schluss Niete))) (Schluss Treffer) (Blatt' (Schluss Freilos))) Niete Freilos @?= EQ
+                analysiere''' (Gabel' (Gabel' (Blatt' (Kopf Treffer (Schluss Niete))) (Schluss Freilos) (Blatt' (Schluss Niete))) (Schluss Treffer) (Blatt' (Schluss Freilos))) Niete Freilos @?= EQ,
+            testCase "analysiere''' recursive" $
+                let a = Kopf Niete a in analysiere''' (Blatt' a) Niete Niete @?= EQ
         ]
