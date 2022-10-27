@@ -14,17 +14,18 @@ spec = testGroup "Angabe3"[
     minusTest,
     absTest,         
     mixedTest,
-    errorTest,
-    infiniteTest,
-    qcProps
+--    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
+--    infiniteTest2, -- 5 rows, row 3 is infinite
+    errorTest
     ]
 
 properties :: TestTree
 properties = testGroup "Properties" [ qcProps]
 
-
-fehler :: a
-fehler = error "Argument(e) typfehlerhaft"
+m31 :: Matrix
+m31 = Z (LE 1)(Z (LE 1)(LZ (LE 1)))
+m22 :: Matrix
+m22 = Z (E 1 (LE 1)) (LZ (E 1 (LE 1)))
 m32:: Matrix
 m32 = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
 m32':: Matrix
@@ -67,7 +68,8 @@ infiniRow :: Zeile
 infiniRow = E 0 infiniRow
 infiniMatrix :: Matrix
 infiniMatrix = Z (LE 1) (Z (E 2 (LE 3)) (Z infiniRow (Z (E (-3)(LE (-2))) (LZ (LE (-1))))))
-                
+infiniMatrix2 :: Matrix
+infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))                
                 
 
 unitTests :: TestTree
@@ -121,12 +123,12 @@ eqTest =
                 m24==m24' @?= True,
             testCase "(==),False" $            
                 m11==n11 @?=  False,
-            testCase "(/=),False" $                
-                m14/=m14' @?= False,
             testCase "(/=),True" $
                 m32/=n32 @?=  True,
             testCase "(/=),True" $            
-                n14/=n14' @?= True
+                n14/=n14' @?= True,
+            testCase "(/=),False" $                
+                m14/=m14' @?= False
         ]
 plusTest :: TestTree
 plusTest =
@@ -179,7 +181,7 @@ mixedTest =
 errorTest :: TestTree
 errorTest =
     testGroup
-        "these should fail with \"Argument(e) typfehlerhaft\""
+        "these should fail with \"Argument(e) typfehlerhaft\"\n there are 2 more test groups on matrices with infinite length columns to uncomment at your own discretion (line 17,18) \n "
         [   
             testCase "1" $
                 m14 + n11 @?= error "Argument(e) typfehlerhaft",
@@ -188,24 +190,40 @@ errorTest =
             testCase "3" $                
                 n24' == m32 @?= error "Argument(e) typfehlerhaft"
         ]
-infiniteTest :: TestTree
-infiniteTest =
+infiniteTest1 :: TestTree
+infiniteTest1 =
     testGroup "row 3/5 is infinite \n "
         [   
             testCase "matrixtyp (succeeds or recurses infinitely)" $
                 matrixtyp infiniMatrix @?= KeineMatrix,
-            testCase "addition (error expected)" $
+            testCase "(+) (exception desired)" $
                 infiniMatrix+m32 @?= error "Argument(e) typfehlerhaft",
-            testCase "subtraction (error expected)" $
+            testCase "(-) (exception desired)" $
                 n24'- infiniMatrix @?= error "Argument(e) typfehlerhaft",  
-            testCase "abs (error expected)" $
+            testCase "abs (exception desired)" $
                 abs infiniMatrix @?= error "Argument(e) typfehlerhaft",         
-            testCase "(==)(error expected)" $
+            testCase "(==)(exception desired)" $
                 infiniMatrix == infiniMatrix @?= error "Argument(e) typfehlerhaft",
-            testCase "(/=)(error expected)" $
+            testCase "(/=)(exception desired)" $
                 infiniMatrix /= infiniMatrix @?= error "Argument(e) typfehlerhaft"  
         ]
-
+infiniteTest2 :: TestTree
+infiniteTest2 =
+    testGroup "rows 1 and 5 are safe - 2,3,4 are infinite \n "
+        [   
+            testCase "matrixtyp (succeeds or recurses infinitely)" $
+                matrixtyp infiniMatrix2 @?= KeineMatrix,
+             testCase "(+) (exception desired)" $
+                 infiniMatrix2+m32 @?= error "Argument(e) typfehlerhaft",
+             testCase "(-) (exception desired)" $
+                 n24'- infiniMatrix2 @?= error "Argument(e) typfehlerhaft",  
+             testCase "abs (exception desired)" $
+                 abs infiniMatrix2 @?= error "Argument(e) typfehlerhaft",         
+             testCase "(==)(exception desired)" $
+                 infiniMatrix2 == infiniMatrix2 @?= error "Argument(e) typfehlerhaft",
+             testCase "(/=)(exception desired)" $
+                 infiniMatrix2 /= infiniMatrix2 @?= error "Argument(e) typfehlerhaft"  
+        ]
 
 
 

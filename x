@@ -1,3 +1,4 @@
+  {-# HLINT ignore "Use camelCase" #-}
   {-# LANGUAGE InstanceSigs #-}
   module Angabe3 where
 
@@ -38,8 +39,7 @@
 
 
 
-  data Matrixtyp = Matrix_vom_Typ Typ 
-                    | KeineMatrix deriving (Eq,Show)
+  data Matrixtyp = Matrix_vom_Typ Typ | KeineMatrix deriving (Eq,Show)
 
 
 
@@ -49,6 +49,11 @@
   matrixtyp (Z z m)
     | not (equalWidths m (getWidth z)) = KeineMatrix
     | otherwise = Matrix_vom_Typ (1 + getHeight m, getWidth z)
+
+
+
+
+
     where
         equalWidths :: Matrix -> Int -> Bool
         equalWidths (LZ z) x = getWidth z == x
@@ -65,49 +70,6 @@
 
 
 
-  m32:: Matrix
-  m32 = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
-  m32':: Matrix
-  m32' = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
-  m11:: Matrix
-  m11 = LZ (LE 1)
-  m11':: Matrix
-  m11' = LZ (LE 1)
-  m14:: Matrix
-  m14 = LZ (E 1(E 1(E 1 (LE 1))))
-  m14':: Matrix
-  m14' = LZ (E 1(E 1(E 1 (LE 1))))
-  m24:: Matrix
-  m24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
-  m24':: Matrix
-  m24' = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
-
-  n32:: Matrix
-  n32 = Z(E 2 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
-  n32':: Matrix
-  n32' = Z(E 1 (LE 1)) (Z (E 1 (LE 3)) (LZ (E 1 (LE 1))))
-  n11:: Matrix
-  n11 = LZ (LE 5)
-  n11':: Matrix
-  n11' = LZ (LE 10)
-  n14:: Matrix
-  n14 = LZ (E 1(E 1(E 1 (LE 21))))
-  n14':: Matrix
-  n14' = LZ (E 1(E 1(E 2 (LE 1))))
-  n24:: Matrix
-  n24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 3(E 1(E 1 (LE 1)))))
-  n24':: Matrix
-  n24' = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 3 (LE 1)))))
-
-  mk :: Matrix
-  mk = Z (E 1(E 1(LE 1))) (LZ (E 1(E 1(E 1 (LE 1)))))
-
-
-
-
-
-
-
   instance Eq Matrix where
    (==) :: Matrix -> Matrix -> Bool
    m1 == m2 = cMat m1 m2
@@ -116,13 +78,34 @@
         cMat (LZ x)(LZ y)       = cRow x y
         cMat (Z x xs)(Z y ys)   = cRow x y && cMat xs ys
         cMat _ _ = fehler
+
+
+
+
         cRow :: Zeile -> Zeile -> Bool
         cRow (LE x)(LE y)       = x == y
         cRow (E x xs)(E y ys)   = x == y && cRow xs ys
         cRow _ _ = fehler
+
+
+
+
+
+
+
+
  
    (/=) :: Matrix -> Matrix -> Bool
    m1 /= m2 = not (m1==m2)
+
+
+
+
+
+
+
+
+
 
 
 
@@ -133,100 +116,57 @@
    (+) :: Zeile -> Zeile -> Zeile
    (LE x) + (LE y)      = LE (x + y)
    (E x xs) + (E y ys)  = E (x + y)(xs+ys)
+   (LE _) + (E _ _) = fehler
+   (E _ _) + (LE _) = fehler
 
    (-) :: Zeile -> Zeile -> Zeile
    (LE x) - (LE y)      = LE (x - y)
    (E x xs) - (E y ys)  = E (x - y)(xs-ys)
+   (LE _) - (E _ _) = fehler
+   (E _ _) - (LE _) = fehler
 
    abs :: Zeile -> Zeile
-   LE x   = LE(abs x)
-   E x xs = E (abs x) xs
+   abs (LE x) = LE(abs x)
+   abs (E x xs) = E (abs x) (abs xs)
 
   instance Num Matrix where
+
    (+) :: Matrix -> Matrix -> Matrix
    (LZ x)+(LZ y)        = LZ (x + y)
    (Z x xs)+(Z y ys)    = Z (x + y)(xs+ys)
+   (LZ _) + (Z _ _) = fehler
+   (Z _ _) + (LZ _) = fehler
 
    (-) :: Matrix -> Matrix -> Matrix
    (LZ x)-(LZ y)        = LZ (x - y)
    (Z x xs)-(Z y ys)    = Z (x - y)(xs-ys)
+   (LZ _) - (Z _ _) = fehler
+   (Z _ _) - (LZ _) = fehler
 
    abs :: Matrix -> Matrix
-   LZ x   = LZ(abs x)
-   Z x xs = Z (abs x) xs
+   abs x
+    | matrixtyp x == KeineMatrix = fehler
+    | otherwise = abs' x
+    where
+        abs' (LZ x)   = LZ(abs x)
+        abs' (Z x xs) = Z (abs x) (abs xs)
 
- 
- 
+
+
+
+
    fromInteger :: Integer -> Matrix
-   fromInteger z = error "noch nicht implementiert!"
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+   fromInteger z = LZ (LE (fromIntegral z))
+
+
    (*) :: Matrix -> Matrix -> Matrix
    m1 * m2 = error "(*) bleibt unimplementiert!"
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
    negate :: Matrix -> Matrix
    negate m = error "negate bleibt unimplementiert!"
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+
    signum :: Matrix -> Matrix
    signum m = error "signum bleibt unimplementiert!"
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-
-
 
 
 

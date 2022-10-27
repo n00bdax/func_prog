@@ -1,3 +1,4 @@
+> {-# OPTIONS_GHC -Wno-name-shadowing #-}
 > {-# HLINT ignore "Use camelCase" #-}
 > {-# LANGUAGE InstanceSigs #-}
 > module Angabe3 where
@@ -46,85 +47,72 @@ Aufgabe A.1
 
 > matrixtyp :: Matrix -> Matrixtyp
 > matrixtyp (LZ z) = Matrix_vom_Typ (1, getWidth z)
-> matrixtyp (Z z m)
->   | not (equalWidths m (getWidth z)) = KeineMatrix
->   | otherwise = Matrix_vom_Typ (1 + getHeight m, getWidth z)
+> matrixtyp (Z z zs) = checkHeight zs 2 (getWidth z)
 >   where
->       equalWidths :: Matrix -> Int -> Bool
->       equalWidths (LZ z) x = getWidth z == x
->       equalWidths (Z z m) x = getWidth z == x && equalWidths m x
+>       checkWidth :: Zeile -> Int -> Bool
+>       checkWidth _ 0 = False
+>       checkWidth (LE _) 1 = True
+>       checkWidth (E _ xs) n = checkWidth xs (n-1)
+>       checkWidth _ _ = False
+
+>       checkHeight :: Matrix -> Int -> Int-> Matrixtyp
+>       checkHeight (LZ z) m n
+>           | checkWidth z n = Matrix_vom_Typ(m,n)
+>           | otherwise = KeineMatrix
+>       checkHeight (Z z zs)m n
+>           | checkWidth z n = checkHeight zs (m+1) n
+>           | otherwise = KeineMatrix
 
 > getWidth :: Zeile -> Int
 > getWidth (E _ x) = 1 + getWidth x
 > getWidth (LE _) = 1
 
 > getHeight :: Matrix -> Int
-> getHeight (LZ z) = 1
-> getHeight (Z z m) = 1 + getHeight m
+> getHeight (LZ _) = 1
+> getHeight (Z _ m) = 1 + getHeight m
 
-testvariablen
-mMN ... matrix, M hoch, n breit, gueltig
 
-m32:: Matrix
-m32 = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
-m32':: Matrix
-m32' = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
-m11:: Matrix
-m11 = LZ (LE 1)
-m11':: Matrix
-m11' = LZ (LE 1)
-m14:: Matrix
-m14 = LZ (E 1(E 1(E 1 (LE 1))))
-m14':: Matrix
-m14' = LZ (E 1(E 1(E 1 (LE 1))))
-m24:: Matrix
-m24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
-m24':: Matrix
-m24' = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
-n32:: Matrix
-n32 = Z(E 2 (LE (-2))) (Z (E 1 (LE (-1))) (LZ (E (-10) (LE 1))))
-n32':: Matrix
-n32' = Z(E 1 (LE 1)) (Z (E 1 (LE 3)) (LZ (E 1 (LE 1))))
-n11:: Matrix
-n11 = LZ (LE 5)
-n11':: Matrix
-n11' = LZ (LE 10)
-n14:: Matrix
-n14 = LZ (E 1(E 1(E 1 (LE 21))))
-n14':: Matrix
-n14' = LZ (E 1(E 1(E 2 (LE 1))))
-n24:: Matrix
-n24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 3(E 1(E 1 (LE 1)))))
-n24':: Matrix
-n24' = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 3 (LE 1)))))
-mk :: Matrix
-mk = Z (E 1(E 1(LE 1))) (LZ (E 1(E 1(E 1 (LE 1)))))
 
-Knapp, aber gut nachvollziebar geht matrixtyp folgendermassen vor: 
-...
 
 Aufgabe A.2
 
 > instance Eq Matrix where
 >  (==) :: Matrix -> Matrix -> Bool
->  m1 == m2 = cMat m1 m2
+>  m1 == m2 = cMat m1 m2 (findWidth m1)
 >   where
->       cMat :: Matrix -> Matrix -> Bool
->       cMat (LZ x)(LZ y)       = cRow x y
->       cMat (Z x xs)(Z y ys)   = cRow x y && cMat xs ys
->       cMat _ _ = fehler
->       cRow :: Zeile -> Zeile -> Bool
->       cRow (LE x)(LE y)       = x == y
->       cRow (E x xs)(E y ys)   = x == y && cRow xs ys
->       cRow _ _ = fehler
+
+>   findWidth :: Matrix -> Int
+>   findWidth (LZ x) = getWidth x
+>   findWidth (Z x _) = getWidth x
+
+>   cMat :: Matrix -> Matrix -> Int -> Bool
+>   cMat (LZ x)(LZ y) z       = cRow x y z
+>   cMat (Z x xs)(Z y ys) z   = cRow x y z && cMat xs ys z
+>   cMat _ _ _ = fehler
+
+>   cRow :: Zeile -> Zeile -> Int -> Bool
+>   cRow _ _ 0 = fehler
+>   cRow (LE x)(LE y)1       = x == y
+>   cRow (E x xs)(E y ys)z   = x == y && cRow xs ys (z-1)
+>   cRow _ _ _= fehler
+
+
+handling faulty matrix structure mid operation is more
+robust when handling infinitely recursing matrices
+ - still breaks if the first row of m1 is infinite
+
 >
 >  (/=) :: Matrix -> Matrix -> Bool
 >  m1 /= m2 = not (m1==m2)
+
 
 Knapp, aber gut nachvollziehbar geht die Instanzdeklaration fuer Eq folgendermassen vor:
 ...
  
 Aufgabe A.3
+
+
+basic operations on lines and matrices
 
 > instance Num Zeile where
 >  (+) :: Zeile -> Zeile -> Zeile
@@ -146,27 +134,40 @@ Aufgabe A.3
 > instance Num Matrix where
 
 >  (+) :: Matrix -> Matrix -> Matrix
->  (LZ x)+(LZ y)        = LZ (x + y)
->  (Z x xs)+(Z y ys)    = Z (x + y)(xs+ys)
->  (LZ _) + (Z _ _) = fehler
->  (Z _ _) + (LZ _) = fehler
+>  a+b
+>   | matrixtyp a == KeineMatrix = fehler
+>   | otherwise = plus a b
+>   where 
+>   plus (LZ x)(LZ y)    = LZ (x + y)
+>   plus (Z x xs)(Z y ys)= Z (x + y)(plus xs ys)
+>   plus (LZ _)  (Z _ _) = fehler
+>   plus (Z _ _)  (LZ _) = fehler
 
 >  (-) :: Matrix -> Matrix -> Matrix
->  (LZ x)-(LZ y)        = LZ (x - y)
->  (Z x xs)-(Z y ys)    = Z (x - y)(xs-ys)
->  (LZ _) - (Z _ _) = fehler
->  (Z _ _) - (LZ _) = fehler
+>  a-b
+>   | matrixtyp a == KeineMatrix = fehler
+>   | otherwise = minus a b
+>   where
+>   minus (LZ x)(LZ y)     = LZ (x - y)
+>   minus (Z x xs)(Z y ys) = Z (x - y)(minus xs ys)
+>   minus (LZ _)(Z _ _) = fehler
+>   minus (Z _ _)(LZ _) = fehler
 
 >  abs :: Matrix -> Matrix
->  abs x
->   | matrixtyp x == KeineMatrix = fehler
->   | otherwise = abs' x
+>  abs a
+>   | matrixtyp a == KeineMatrix = fehler
+>   | otherwise = abs' a
 >   where
->       abs' (LZ x)   = LZ(abs x)
->       abs' (Z x xs) = Z (abs x) (abs xs)
+>       abs' (LZ a)   = LZ(abs a)
+>       abs' (Z a xs) = Z (abs a) (abs xs)
+
+
+
+a
 
 >  fromInteger :: Integer -> Matrix
 >  fromInteger z = LZ (LE (fromIntegral z))
+
 
 >  (*) :: Matrix -> Matrix -> Matrix
 >  m1 * m2 = error "(*) bleibt unimplementiert!"
@@ -177,9 +178,6 @@ Aufgabe A.3
 >  signum :: Matrix -> Matrix
 >  signum m = error "signum bleibt unimplementiert!"
 
-
-Knapp, aber gut nachvollziebar geht die Instanzdeklaration fuer Num folgendermassen vor:
-... 
 
 
 

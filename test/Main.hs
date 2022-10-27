@@ -21,12 +21,13 @@ main = defaultMain tests
 
 tests :: TestTree
 tests = testGroup "Fprog Tests"
-    [ TestSuite1.spec
-    , TestSuite2.spec
-    , TestSuite3.spec
-    , TestSuite4.spec
-    , TestSuite5.spec
-    , TestSuite6.spec
-    , TestSuite7.spec
-    , Angabe1_TestSuite1.spec
+    [ 
+     TestSuite1.spec,
+     TestSuite2.spec,
+     TestSuite3.spec,
+     TestSuite4.spec,
+     TestSuite5.spec,
+     TestSuite6.spec,
+     TestSuite7.spec,
+     Angabe1_TestSuite1.spec
     ]
