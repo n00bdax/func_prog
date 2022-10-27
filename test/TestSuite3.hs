@@ -14,8 +14,8 @@ spec = testGroup "Angabe3"[
     minusTest,
     absTest,         
     mixedTest,
---    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
---    infiniteTest2, -- 5 rows, row 3 is infinite
+    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
+    infiniteTest2, -- 5 rows, row 3 is infinite
     errorTest
     ]
 
@@ -23,52 +23,52 @@ properties :: TestTree
 properties = testGroup "Properties" [ qcProps]
 
 m31 :: Matrix
-m31 = Z (LE 1)(Z (LE 1)(LZ (LE 1)))
 m22 :: Matrix
-m22 = Z (E 1 (LE 1)) (LZ (E 1 (LE 1)))
 m32:: Matrix
-m32 = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
 m32':: Matrix
-m32' = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
 m11:: Matrix
-m11 = LZ (LE 1)
 m11':: Matrix
-m11' = LZ (LE 1)
 m14:: Matrix
-m14 = LZ (E 1(E 1(E 1 (LE 1))))
 m14':: Matrix
-m14' = LZ (E 1(E 1(E 1 (LE 1))))
 m24:: Matrix
-m24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
 m24':: Matrix
-m24' = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
 n32:: Matrix
-n32 = Z(E 2 (LE (-2))) (Z (E 1 (LE (-1))) (LZ (E (-10) (LE 1))))
 n32':: Matrix
-n32' = Z(E 1 (LE 1)) (Z (E 1 (LE 3)) (LZ (E 1 (LE 1))))
 n11:: Matrix
-n11 = LZ (LE 5)
 n11':: Matrix
-n11' = LZ (LE 10)
 n14:: Matrix
-n14 = LZ (E 1(E 1(E 1 (LE 21))))
 n14':: Matrix
-n14' = LZ (E 1(E 1(E 2 (LE 1))))
 n24:: Matrix
-n24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 3(E 1(E 1 (LE 1)))))
 n24':: Matrix
-n24' = Z (E (-11)(E (-99)(E 2321 (LE (-1231))))) (LZ (E (-11)(E 1231(E (-8888) (LE (-2))))))
 mk1 :: Matrix
-mk1 = Z (E 2 (LE 1))(LZ (LE 10)) 
 mk2 :: Matrix
-mk2 = Z (E 2 (LE 1))(LZ (E 10 (E 10 (E 2 (LE 2))))) 
 mk3 :: Matrix
-mk3 = Z (E 1(E 1(LE 1))) (LZ (E 1(E 1(E 1 (LE 1)))))
 infiniRow :: Zeile
-infiniRow = E 0 infiniRow
 infiniMatrix :: Matrix
-infiniMatrix = Z (LE 1) (Z (E 2 (LE 3)) (Z infiniRow (Z (E (-3)(LE (-2))) (LZ (LE (-1))))))
 infiniMatrix2 :: Matrix
+m31 = Z (LE 1)(Z (LE 1)(LZ (LE 1)))
+m22 = Z (E 1 (LE 1)) (LZ (E 1 (LE 1)))
+m32 = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
+m32' = Z(E 1 (LE 1)) (Z (E 1 (LE 1)) (LZ (E 1 (LE 1))))
+m11 = LZ (LE 1)
+m11' = LZ (LE 1)
+m14 = LZ (E 1(E 1(E 1 (LE 1))))
+m14' = LZ (E 1(E 1(E 1 (LE 1))))
+m24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
+m24' = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 1(E 1(E 1 (LE 1)))))
+n32 = Z(E 2 (LE (-2))) (Z (E 1 (LE (-1))) (LZ (E (-10) (LE 1))))
+n32' = Z(E 1 (LE 1)) (Z (E 1 (LE 3)) (LZ (E 1 (LE 1))))
+n11 = LZ (LE 5)
+n11' = LZ (LE 10)
+n14 = LZ (E 1(E 1(E 1 (LE 21))))
+n14' = LZ (E 1(E 1(E 2 (LE 1))))
+n24 = Z (E 1(E 1(E 1 (LE 1)))) (LZ (E 3(E 1(E 1 (LE 1)))))
+n24' = Z (E (-11)(E (-99)(E 2321 (LE (-1231))))) (LZ (E (-11)(E 1231(E (-8888) (LE (-2))))))
+mk1 = Z (E 2 (LE 1))(LZ (LE 10)) 
+mk2 = Z (E 2 (LE 1))(LZ (E 10 (E 10 (E 2 (LE 2))))) 
+mk3 = Z (E 1(E 1(LE 1))) (LZ (E 1(E 1(E 1 (LE 1)))))
+infiniRow = E 0 infiniRow
+infiniMatrix = Z (LE 1) (Z (E 2 (LE 3)) (Z infiniRow (Z (E (-3)(LE (-2))) (LZ (LE (-1))))))
 infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))                
                 
 
@@ -188,11 +188,15 @@ errorTest =
             testCase "2" $                
                 abs m32-n24 @?= error "Argument(e) typfehlerhaft",
             testCase "3" $                
-                n24' == m32 @?= error "Argument(e) typfehlerhaft"
+                n24' == m32 @?= error "Argument(e) typfehlerhaft",
+            testCase "4" $                
+                m31 == mk1 @?= error "Argument(e) typfehlerhaft",
+            testCase "5" $                
+                mk1 /= m31 @?= error "Argument(e) typfehlerhaft"
         ]
 infiniteTest1 :: TestTree
 infiniteTest1 =
-    testGroup "row 3/5 is infinite \n "
+    testGroup "row 3/5 is infinite"
         [   
             testCase "matrixtyp (succeeds or recurses infinitely)" $
                 matrixtyp infiniMatrix @?= KeineMatrix,
@@ -209,7 +213,7 @@ infiniteTest1 =
         ]
 infiniteTest2 :: TestTree
 infiniteTest2 =
-    testGroup "rows 1 and 5 are safe - 2,3,4 are infinite \n "
+    testGroup "rows 1 and 5 are safe - 2,3,4 are infinite"
         [   
             testCase "matrixtyp (succeeds or recurses infinitely)" $
                 matrixtyp infiniMatrix2 @?= KeineMatrix,

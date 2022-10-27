@@ -1,5 +1,4 @@
 > {-# OPTIONS_GHC -Wno-name-shadowing #-}
-> {-# HLINT ignore "Use camelCase" #-}
 > {-# LANGUAGE InstanceSigs #-}
 > module Angabe3 where
 
@@ -77,25 +76,22 @@ Aufgabe A.1
 Aufgabe A.2
 
 > instance Eq Matrix where
+
 >  (==) :: Matrix -> Matrix -> Bool
->  m1 == m2 = cMat m1 m2 (findWidth m1)
+>  a==b
+>   | matrixtyp a == KeineMatrix = fehler
+>   | matrixtyp b == KeineMatrix = fehler
+>   | otherwise = cMat a b
 >   where
+>   cMat :: Matrix -> Matrix -> Bool
+>   cMat (LZ x)(LZ y)      = cRow x y
+>   cMat (Z x xs)(Z y ys)   = cRow x y && cMat xs ys
+>   cMat _ _ = fehler
 
->   findWidth :: Matrix -> Int
->   findWidth (LZ x) = getWidth x
->   findWidth (Z x _) = getWidth x
-
->   cMat :: Matrix -> Matrix -> Int -> Bool
->   cMat (LZ x)(LZ y) z       = cRow x y z
->   cMat (Z x xs)(Z y ys) z   = cRow x y z && cMat xs ys z
->   cMat _ _ _ = fehler
-
->   cRow :: Zeile -> Zeile -> Int -> Bool
->   cRow _ _ 0 = fehler
->   cRow (LE x)(LE y)1       = x == y
->   cRow (E x xs)(E y ys)z   = x == y && cRow xs ys (z-1)
->   cRow _ _ _= fehler
-
+>   cRow :: Zeile -> Zeile -> Bool
+>   cRow (LE x)(LE y)       = x == y
+>   cRow (E x xs)(E y ys)   = x == y && cRow xs ys
+>   cRow _ _ = fehler
 
 handling faulty matrix structure mid operation is more
 robust when handling infinitely recursing matrices
@@ -130,6 +126,18 @@ basic operations on lines and matrices
 >  abs :: Zeile -> Zeile
 >  abs (LE x) = LE(abs x)
 >  abs (E x xs) = E (abs x) (abs xs)
+
+>  fromInteger :: Integer -> Zeile
+>  fromInteger x = LE (fromIntegral x)
+
+>  (*) :: Zeile -> Zeile -> Zeile
+>  m1 * m2 = error "(*) bleibt unimplementiert!"
+
+>  negate :: Zeile -> Zeile
+>  negate m = error "negate bleibt unimplementiert!"
+
+>  signum :: Zeile -> Zeile
+>  signum m = error "signum bleibt unimplementiert!"
 
 > instance Num Matrix where
 
