@@ -96,7 +96,7 @@ Aufgabe A.2
 
 >
 >  (/=) :: Matrix -> Matrix -> Bool
->  m1 /= m2 = not (m1==m2)
+>  a /= b = not (a==b)
 
 
 Knapp, aber gut nachvollziehbar geht die Instanzdeklaration fuer Eq folgendermassen vor:

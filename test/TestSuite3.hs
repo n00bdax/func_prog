@@ -16,7 +16,8 @@ spec = testGroup "Angabe3"[
     mixedTest,
     infiniteTest1, -- 5 rows, row 2 through 4 are infinite
     infiniteTest2, -- 5 rows, row 3 is infinite
-    errorTest
+    errorTest,
+    stressTest
     ]
 
 properties :: TestTree
@@ -71,12 +72,13 @@ infiniRow = E 0 infiniRow
 infiniMatrix = Z (LE 1) (Z (E 2 (LE 3)) (Z infiniRow (Z (E (-3)(LE (-2))) (LZ (LE (-1))))))
 infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))
 
-mkz::Int->Zeile
-mkz 1 = LE 1
-mkz n = E n (mkz(n-1)) 
-mkm::Int->Int->Matrix
-mkm 1 n = LZ (mkz n)
-mkm m n = Z (mkz n) (mkm (m-1) n)
+mkz::Int->Int->Zeile
+mkz x 1 = LE x
+mkz x n = E (n*x) (mkz x (n-1)) 
+mkm::Int->Int->Int->Matrix
+mkm x 1 n = LZ (mkz x n)
+mkm x m n = Z (mkz x n) (mkm x (m-1) n)
+
 
                 
 
@@ -117,9 +119,7 @@ matrixtypTest =
             testCase "(1,1)" $            
                 matrixtyp n11 @?= Matrix_vom_Typ (1,1),
             testCase "(2,4)" $            
-                matrixtyp n24 @?= Matrix_vom_Typ (2,4),
-            testCase "(10000 10000)" $            
-                matrixtyp (mkm 10000 10000) @?= Matrix_vom_Typ (10000,10000)
+                matrixtyp n24 @?= Matrix_vom_Typ (2,4)
         ]
 
 eqTest :: TestTree
@@ -138,11 +138,7 @@ eqTest =
             testCase "(/=),True" $            
                 n14/=n14' @?= True,
             testCase "(/=),False" $                
-                m14/=m14' @?= False,
-            testCase "(==),True, (3000,3000)" $                
-                mkm 3000 3000==mkm 3000 3000 @?= True,
-            testCase "(/=),False, (3000,3000)" $                
-                mkm 3000 3000/=mkm 3000 3000 @?= False
+                m14/=m14' @?= False
         ]
 plusTest :: TestTree
 plusTest =
@@ -198,18 +194,16 @@ errorTest =
     testGroup
         "these should fail with \"Argument(e) typfehlerhaft\"\n there are 2 more test groups on matrices with infinite length columns to uncomment at your own discretion (line 17,18) \n "
         [   
-            testCase "1" $
+            testCase "(+) (exception desired)" $
                 m14 + n11 @?= error "Argument(e) typfehlerhaft",
-            testCase "2" $                
+            testCase "(-) (exception desired)" $
                 abs m32-n24 @?= error "Argument(e) typfehlerhaft",
-            testCase "3" $                
+            testCase "(==)(exception desired)" $
                 n24' == m32 @?= error "Argument(e) typfehlerhaft",
-            testCase "4" $                
+            testCase "(==)(exception desired)" $
                 m31 == mk1 @?= error "Argument(e) typfehlerhaft",
-            testCase "5" $                
-                mk1 /= m31 @?= error "Argument(e) typfehlerhaft",
-            testCase "6 stress" $                
-                mkm 10000 10000/=mkm 10000 10001 @?= error "Argument(e) typfehlerhaft"
+            testCase "(/=)(exception desired)" $
+                mk1 /= m31 @?= error "Argument(e) typfehlerhaft"
         ]
 infiniteTest1 :: TestTree
 infiniteTest1 =
@@ -244,6 +238,27 @@ infiniteTest2 =
                  infiniMatrix2 == infiniMatrix2 @?= error "Argument(e) typfehlerhaft",
              testCase "(/=)(exception desired)" $
                  infiniMatrix2 /= infiniMatrix2 @?= error "Argument(e) typfehlerhaft"  
+        ]
+stressTest :: TestTree
+stressTest =
+    testGroup "stress tests"
+        [   
+            testCase "matrixtyp = (20000, 20000)" $            
+                matrixtyp (mkm 0 20000 20000) @?= Matrix_vom_Typ (20000,20000),
+            testCase "(==),True, (2000,2000)" $                
+                mkm 0 2000 2000==mkm 0 2000 2000 @?= True,
+            testCase "(/=),same instance, completes instantly if based on (==)" $                
+                mkm 0 2000 2000/=mkm 0 2000 2000 @?= False,
+            testCase "(+), (2000,2000)" $                
+                mkm 3 2000 2000 + mkm 2 2000 2000 @?= mkm 5 2000 2000,
+            testCase "(-), (2000,2000)" $                
+                mkm 3 2000 2000 - mkm 1 2000 2000 @?= mkm 2 2000 2000,
+            testCase "abs, (500,500)" $                
+                abs (mkm (-3) 500 500) @?= mkm 3 500 500,
+            testCase "mixed, (500,500)" $                
+                mkm 3 500 500 - abs (mkm (-2) 500 500) + mkm 4 500 500 @?= mkm 5 500 500,
+            testCase "(/=) mismatched matrices (exception desired)" $                
+                mkm 0 1000 1000/=mkm 0 1000 1001 @?= error "Argument(e) typfehlerhaft"
         ]
 
 
