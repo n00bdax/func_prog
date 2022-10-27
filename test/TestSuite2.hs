@@ -1,9 +1,18 @@
 module TestSuite2 where
 
 import Angabe2
-import Test.Tasty
-import Test.Tasty.QuickCheck as QC
-import Test.Tasty.HUnit
+    ( analysiere,
+      analysiere',
+      analysiere'',
+      analysiere''',
+      Baum(Gabel, Blatt),
+      Baum'(Blatt', Gabel'),
+      Liste(Kopf, Schluss),
+      Liste'(Schluss', Kopf'),
+      Lotterielos(Niete, Treffer, Freilos) )
+import Test.Tasty ( testGroup, TestTree )
+import Test.Tasty.QuickCheck as QC ( (==>), testProperty )
+import Test.Tasty.HUnit ( testCase, (@?=) )
 
 import Data.List
 import Data.Ord
