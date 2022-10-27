@@ -93,9 +93,6 @@ Aufgabe A.2
 >   cRow (E x xs)(E y ys)   = x == y && cRow xs ys
 >   cRow _ _ = fehler
 
-handling faulty matrix structure mid operation is more
-robust when handling infinitely recursing matrices
- - still breaks if the first row of m1 is infinite
 
 >
 >  (/=) :: Matrix -> Matrix -> Bool
@@ -189,6 +186,12 @@ a
 
 
 
+mkz::Int->Zeile
+mkz 1 = LE 1
+mkz n = E n (mkz(n-1))
 
+mkm::Int->Int->Matrix
+mkm 1 n = LZ (mkz n)
+mkm m n = Z (mkz n) (mkm (m-1) n)
 
 

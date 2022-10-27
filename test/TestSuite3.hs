@@ -69,7 +69,15 @@ mk2 = Z (E 2 (LE 1))(LZ (E 10 (E 10 (E 2 (LE 2)))))
 mk3 = Z (E 1(E 1(LE 1))) (LZ (E 1(E 1(E 1 (LE 1)))))
 infiniRow = E 0 infiniRow
 infiniMatrix = Z (LE 1) (Z (E 2 (LE 3)) (Z infiniRow (Z (E (-3)(LE (-2))) (LZ (LE (-1))))))
-infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))                
+infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))
+
+mkz::Int->Zeile
+mkz 1 = LE 1
+mkz n = E n (mkz(n-1)) 
+mkm::Int->Int->Matrix
+mkm 1 n = LZ (mkz n)
+mkm m n = Z (mkz n) (mkm (m-1) n)
+
                 
 
 unitTests :: TestTree
@@ -109,7 +117,9 @@ matrixtypTest =
             testCase "(1,1)" $            
                 matrixtyp n11 @?= Matrix_vom_Typ (1,1),
             testCase "(2,4)" $            
-                matrixtyp n24 @?= Matrix_vom_Typ (2,4)
+                matrixtyp n24 @?= Matrix_vom_Typ (2,4),
+            testCase "(10000 10000)" $            
+                matrixtyp (mkm 10000 10000) @?= Matrix_vom_Typ (10000,10000)
         ]
 
 eqTest :: TestTree
@@ -128,7 +138,11 @@ eqTest =
             testCase "(/=),True" $            
                 n14/=n14' @?= True,
             testCase "(/=),False" $                
-                m14/=m14' @?= False
+                m14/=m14' @?= False,
+            testCase "(==),True, (3000,3000)" $                
+                mkm 3000 3000==mkm 3000 3000 @?= True,
+            testCase "(/=),False, (3000,3000)" $                
+                mkm 3000 3000/=mkm 3000 3000 @?= False
         ]
 plusTest :: TestTree
 plusTest =
@@ -153,6 +167,7 @@ minusTest =
                 n32 - n32 @?= Z (E 0 (LE 0)) (Z (E 0 (LE 0)) (LZ (E 0 (LE 0)))),
             testCase "3" $                
                 m32 - n32 @?= Z (E (-1) (LE 3)) (Z (E 0 (LE 2)) (LZ (E 11 (LE 0))))
+            
         ]
 absTest :: TestTree
 absTest =
@@ -192,7 +207,9 @@ errorTest =
             testCase "4" $                
                 m31 == mk1 @?= error "Argument(e) typfehlerhaft",
             testCase "5" $                
-                mk1 /= m31 @?= error "Argument(e) typfehlerhaft"
+                mk1 /= m31 @?= error "Argument(e) typfehlerhaft",
+            testCase "6 stress" $                
+                mkm 10000 10000/=mkm 10000 10001 @?= error "Argument(e) typfehlerhaft"
         ]
 infiniteTest1 :: TestTree
 infiniteTest1 =
