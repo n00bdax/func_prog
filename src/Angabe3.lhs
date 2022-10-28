@@ -94,10 +94,6 @@ Aufgabe A.2
 >   cRow _ _ = fehler
 
 
->
->  (/=) :: Matrix -> Matrix -> Bool
->  a /= b = not (a==b)
-
 
 Knapp, aber gut nachvollziehbar geht die Instanzdeklaration fuer Eq folgendermassen vor:
 ...
@@ -111,14 +107,12 @@ basic operations on lines and matrices
 >  (+) :: Zeile -> Zeile -> Zeile
 >  (LE x) + (LE y)      = LE (x + y)
 >  (E x xs) + (E y ys)  = E (x + y)(xs+ys)
->  (LE _) + (E _ _) = fehler
->  (E _ _) + (LE _) = fehler
+>  _ + _ = fehler
 
 >  (-) :: Zeile -> Zeile -> Zeile
 >  (LE x) - (LE y)      = LE (x - y)
 >  (E x xs) - (E y ys)  = E (x - y)(xs-ys)
->  (LE _) - (E _ _) = fehler
->  (E _ _) - (LE _) = fehler
+>  _ - _ = fehler
 
 >  abs :: Zeile -> Zeile
 >  abs (LE x) = LE(abs x)
@@ -141,22 +135,24 @@ basic operations on lines and matrices
 >  (+) :: Matrix -> Matrix -> Matrix
 >  a+b
 >   | matrixtyp a == KeineMatrix = fehler
+>   | matrixtyp a /= matrixtyp b = fehler
 >   | otherwise = plus a b
 >   where 
->   plus (LZ x)(LZ y)    = LZ (x + y)
->   plus (Z x xs)(Z y ys)= Z (x + y)(plus xs ys)
->   plus (LZ _)  (Z _ _) = fehler
->   plus (Z _ _)  (LZ _) = fehler
+>   plus :: Matrix -> Matrix -> Matrix
+>   plus  (LZ x)  (LZ y)  = LZ(x + y)
+>   plus (Z x xs)(Z y ys) = Z (x + y)(plus xs ys)
+>   plus _ _ = fehler
 
 >  (-) :: Matrix -> Matrix -> Matrix
 >  a-b
 >   | matrixtyp a == KeineMatrix = fehler
+>   | matrixtyp a /= matrixtyp b = fehler
 >   | otherwise = minus a b
 >   where
->   minus (LZ x)(LZ y)     = LZ (x - y)
+>   minus :: Matrix -> Matrix -> Matrix
+>   minus  (LZ x)  (LZ y)  = LZ(x - y)
 >   minus (Z x xs)(Z y ys) = Z (x - y)(minus xs ys)
->   minus (LZ _)(Z _ _) = fehler
->   minus (Z _ _)(LZ _) = fehler
+>   minus _ _ = fehler
 
 >  abs :: Matrix -> Matrix
 >  abs a
@@ -168,7 +164,6 @@ basic operations on lines and matrices
 
 
 
-a
 
 >  fromInteger :: Integer -> Matrix
 >  fromInteger z = LZ (LE (fromIntegral z))

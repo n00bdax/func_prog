@@ -2,10 +2,19 @@ module TestSuite3 where
 
 import Angabe3
 import Test.Tasty
-import Test.Tasty.QuickCheck as QC
+--import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
 
 import Data.List
+import Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
+
+
+main :: IO ()
+main =
+  defaultMainWithIngredients
+    [consoleTestReporter]
+    spec
+
 spec :: TestTree
 spec = testGroup "Angabe3"[
     matrixtypTest, 
@@ -14,14 +23,16 @@ spec = testGroup "Angabe3"[
     minusTest,
     absTest,         
     mixedTest,
-    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
-    infiniteTest2, -- 5 rows, row 3 is infinite
+--    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
+--    infiniteTest2, -- 5 rows, row 3 is infinite
     errorTest,
     stressTest
     ]
 
 properties :: TestTree
-properties = testGroup "Properties" [ qcProps]
+properties = testGroup "Properties" [ 
+    --qcProps
+    ]
 
 m31 :: Matrix
 m22 :: Matrix
@@ -92,17 +103,17 @@ unitTests = testGroup "Unit tests"
       [1, 2, 3] `compare` [1,2,2] @?= LT
   ]
 
-qcProps :: TestTree
-qcProps = testGroup "(checked by QuickCheck)"
-  [ QC.testProperty "sort == sort . reverse" $
-      \list -> sort (list :: [Int]) == sort (reverse list)
-  , QC.testProperty "Fermat's little theorem" $
-      \x -> ((x :: Integer)^7 - x) `mod` 7 == 0
-  -- the following property does not hold
-  , QC.testProperty "Fermat's last theorem" $
-      \x y z n ->
-        (n :: Integer) >= 3 QC.==> x^n + y^n /= (z^n :: Integer)
-  ]
+-- qcProps :: TestTree
+-- qcProps = testGroup "(checked by QuickCheck)"
+--   [ QC.testProperty "sort == sort . reverse" $
+--       \list -> sort (list :: [Int]) == sort (reverse list)
+--   , QC.testProperty "Fermat's little theorem" $
+--       \x -> ((x :: Integer)^7 - x) `mod` 7 == 0
+--   -- the following property does not hold
+--   , QC.testProperty "Fermat's last theorem" $
+--       \x y z n ->
+--         (n :: Integer) >= 3 QC.==> x^n + y^n /= (z^n :: Integer)
+--   ]
 matrixtypTest :: TestTree
 matrixtypTest =
     testGroup
@@ -243,11 +254,11 @@ stressTest :: TestTree
 stressTest =
     testGroup "stress tests"
         [   
-            testCase "matrixtyp = (20000, 20000)" $            
-                matrixtyp (mkm 0 20000 20000) @?= Matrix_vom_Typ (20000,20000),
+            testCase "matrixtyp = (10000, 10000)" $            
+                matrixtyp (mkm 0 10000 10000) @?= Matrix_vom_Typ (10000,10000),
             testCase "(==),True, (2000,2000)" $                
                 mkm 0 2000 2000==mkm 0 2000 2000 @?= True,
-            testCase "(/=),same instance, completes instantly if based on (==)" $                
+            testCase "(/=),same instance, instant if based on (==)" $                
                 mkm 0 2000 2000/=mkm 0 2000 2000 @?= False,
             testCase "(+), (2000,2000)" $                
                 mkm 3 2000 2000 + mkm 2 2000 2000 @?= mkm 5 2000 2000,
@@ -258,7 +269,7 @@ stressTest =
             testCase "mixed, (500,500)" $                
                 mkm 3 500 500 - abs (mkm (-2) 500 500) + mkm 4 500 500 @?= mkm 5 500 500,
             testCase "(/=) mismatched matrices (exception desired)" $                
-                mkm 0 1000 1000/=mkm 0 1000 1001 @?= error "Argument(e) typfehlerhaft"
+                mkm 0 20000 20000/=mkm 0 20000 20001 @?= error "Argument(e) typfehlerhaft"
         ]
 
 
