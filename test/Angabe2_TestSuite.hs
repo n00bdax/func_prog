@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module TestSuite2 where
+module Angabe2_TestSuite where
 
 import Angabe2 hiding
   ( concat,
@@ -19,7 +19,6 @@ import Test.Tasty.HUnit as T
 import Test.Tasty.Ingredients (composeReporters)
 import Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
 
-{-# ANN module "HLint: ignore Use camelCase" #-}
 
 main :: IO ()
 main = defaultMainWithIngredients [consoleTestReporter] spec
@@ -27,7 +26,7 @@ main = defaultMainWithIngredients [consoleTestReporter] spec
 spec :: TestTree
 spec =
   testGroup
-    "TestSuite2 Spec"
+    "Angabe2_TestSuite"
     [ a1_Tests,
       a2_Tests,
       a3_Tests,

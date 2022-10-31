@@ -19,7 +19,7 @@
 -}
 {-# LANGUAGE TupleSections #-}
 
-module TestSuite1 where
+module Angabe1_TestSuite where
 
 import Angabe1 hiding (main, repeat, replicate, sort)
 import Data.List (sort)
@@ -38,7 +38,7 @@ main =
 spec :: TestTree
 spec =
   testGroup
-    "TestSuite1 Spec"
+    "Angabe1_TestSuite"
     [ haeufigkeitTests
     , gewichtTests
     , korrigiereTests

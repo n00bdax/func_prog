@@ -10,11 +10,12 @@ import Test.Tasty.HUnit
 import qualified TestSuite1
 import qualified TestSuite2
 import qualified TestSuite3
-import qualified TestSuite4
-import qualified TestSuite5
-import qualified TestSuite6
-import qualified TestSuite7
-import qualified Angabe1_TestSuite1
+--import qualified TestSuite4
+--import qualified TestSuite5
+--import qualified TestSuite6
+--import qualified TestSuite7
+import qualified Angabe1_TestSuite
+import qualified Angabe2_TestSuite
 
 main :: IO ()
 main = defaultMain tests
@@ -25,10 +26,10 @@ tests = testGroup "Fprog Tests"
      TestSuite1.spec,
      TestSuite2.spec,
      TestSuite3.spec,
-     TestSuite4.spec,
-     TestSuite5.spec,
-     TestSuite6.spec,
-     TestSuite7.spec,
-     Angabe1_TestSuite.spec
+--     TestSuite4.spec,
+--     TestSuite5.spec,
+--     TestSuite6.spec,
+--     TestSuite7.spec,
+     Angabe1_TestSuite.spec,
      Angabe2_TestSuite.spec
     ]

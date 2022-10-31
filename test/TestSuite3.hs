@@ -256,20 +256,20 @@ stressTest =
         [   
             testCase "matrixtyp = (10000, 10000)" $            
                 matrixtyp (mkm 0 10000 10000) @?= Matrix_vom_Typ (10000,10000),
-            testCase "(==),True, (2000,2000)" $                
-                mkm 0 2000 2000==mkm 0 2000 2000 @?= True,
+            testCase "(==),True, (1000,1000)" $                
+                mkm 0 1000 1000==mkm 0 1000 1000 @?= True,
             testCase "(/=),same instance, instant if based on (==)" $                
-                mkm 0 2000 2000/=mkm 0 2000 2000 @?= False,
-            testCase "(+), (2000,2000)" $                
-                mkm 3 2000 2000 + mkm 2 2000 2000 @?= mkm 5 2000 2000,
-            testCase "(-), (2000,2000)" $                
-                mkm 3 2000 2000 - mkm 1 2000 2000 @?= mkm 2 2000 2000,
+                mkm 0 1000 1000/=mkm 0 1000 1000 @?= False,
+            testCase "(+), (1000,1000)" $                
+                mkm 3 1000 1000 + mkm 2 1000 1000 @?= mkm 5 1000 1000,
+            testCase "(-), (1000,1000)" $                
+                mkm 3 1000 1000 - mkm 1 1000 1000 @?= mkm 2 1000 1000,
             testCase "abs, (500,500)" $                
                 abs (mkm (-3) 500 500) @?= mkm 3 500 500,
             testCase "mixed, (500,500)" $                
                 mkm 3 500 500 - abs (mkm (-2) 500 500) + mkm 4 500 500 @?= mkm 5 500 500,
             testCase "(/=) mismatched matrices (exception desired)" $                
-                mkm 0 20000 20000/=mkm 0 20000 20001 @?= error "Argument(e) typfehlerhaft"
+                mkm 0 10000 10000/=mkm 0 10000 10001 @?= error "Argument(e) typfehlerhaft"
         ]
 
 
