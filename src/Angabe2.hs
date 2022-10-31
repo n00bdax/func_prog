@@ -1,3 +1,4 @@
+{-# LANGUAGE InstanceSigs #-}
 module Angabe2 where
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
@@ -29,6 +30,52 @@ data Baum' = Blatt' Liste
 type Loswert    = Lotterielos
 type Auswertung = Ordering
 
+-- Aufgabe A.1
+analysiere :: Liste -> Loswert -> Loswert -> Auswertung
+analysiere = analyze
+-- Aufgabe A.2
+analysiere' :: Baum -> Loswert -> Loswert -> Auswertung
+analysiere' = analyze
+-- Aufgabe A.3
+analysiere'' :: Liste' -> Loswert -> Loswert -> Auswertung
+analysiere'' = analyze
+-- Aufgabe A.4
+analysiere''' :: Baum' -> Loswert -> Loswert -> Auswertung
+analysiere''' = analyze
+
+class DatStruct a where
+  count :: a -> Lotterielos -> Int
+  analyze :: a -> Loswert -> Loswert -> Auswertung
+  analyze a first second
+    | first == second = EQ
+    | otherwise = compare (count a first)(count a second)
+
+instance DatStruct Liste where
+  count :: Liste -> Lotterielos -> Int
+  count (Schluss x) y = fromEnum (x==y)
+  count (Kopf x xs) y = count xs y + fromEnum (x==y)
+
+instance DatStruct Liste' where
+  count :: Liste' -> Lotterielos -> Int
+  count (Schluss' x) y = count x y
+  count (Kopf' x xs) y = count xs y + count x y
+  
+instance DatStruct Baum where
+  count :: Baum -> Lotterielos -> Int
+  count (Blatt x) y = fromEnum (x==y)
+  count (Gabel a x b) y = count a y +  fromEnum (x==y) + count b y
+
+instance DatStruct Baum' where
+  count :: Baum' -> Lotterielos -> Int
+  count (Blatt' x) y = count x y
+  count (Gabel' a x b) y = count a y + count x y + count b y
+  
+
+{-
+analysiere* vergleicht Werte
+count zaehlt Werte ab
+
+-}
 
 --debug variables
 {-
@@ -73,51 +120,3 @@ b2' = Gabel' (Blatt' l1) l2 (Gabel' (Blatt' l2) l2 (Blatt' l1))
 -- 14 Treffer, 1 Freilos, 14 Niete
 -}
 
--- Aufgabe A.1
-analysiere :: Liste -> Loswert -> Loswert -> Auswertung
-analysiere l lw lw' 
-  | lw == lw' = EQ 
-  | otherwise = compare (cL l lw)(cL l lw')
-
-cL :: Liste -> Lotterielos -> Int
-cL (Schluss x) val = fromEnum (x==val)
-cL (Kopf x xs) val = cL xs val + fromEnum (x==val)
-
--- Aufgabe A.2
-analysiere' :: Baum -> Loswert -> Loswert -> Auswertung
-analysiere' b lw lw'  
-  | lw == lw' = EQ 
-  | otherwise = compare (cT b lw)(cT b lw')
-
-cL' :: Liste' -> Lotterielos -> Int
-cL' (Schluss' x) val = cT x val
-cL' (Kopf' x xs) val = cL' xs val + cT x val
-
--- Aufgabe A.3
-analysiere'' :: Liste' -> Loswert -> Loswert -> Auswertung
-analysiere'' l lw lw'  
-  | lw == lw' = EQ 
-  | otherwise = compare (cL' l lw)(cL' l lw')
-
-cT :: Baum -> Lotterielos -> Int
-cT (Blatt x) val = fromEnum (x==val)
-cT (Gabel a x b) val = cT a val +  fromEnum (x==val) + cT b val
-
--- Aufgabe A.4
-analysiere''' :: Baum' -> Loswert -> Loswert -> Auswertung
-analysiere''' b lw lw'  
-  | lw == lw' = EQ 
-  | otherwise = compare (cT' b lw)(cT' b lw')
-
-cT' :: Baum' -> Lotterielos -> Int
-cT' (Blatt' x) val = cL x val
-cT' (Gabel' a x b) val = cT' a val + cL x val + cT' b val
-
-{-
-analysiere* vergleicht Werte
-cL berechnet Übereinstimmungen in einer linked list mit Variablen
-cT berechnet Übereinstimmungen in einem tree mit Variablen
-cL' summiert Übereinstimmungen in einer linked list aus trees (calls cT)
-cT' summiert Übereinstimmungen in einem tree aus linked lists (calls cL)
-
--}

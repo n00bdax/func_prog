@@ -2,10 +2,19 @@ module TestSuite3 where
 
 import Angabe3
 import Test.Tasty
-import Test.Tasty.QuickCheck as QC
+--import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
 
 import Data.List
+import Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
+
+
+main :: IO ()
+main =
+  defaultMainWithIngredients
+    [consoleTestReporter]
+    spec
+
 spec :: TestTree
 spec = testGroup "Angabe3"[
     matrixtypTest, 
@@ -14,13 +23,16 @@ spec = testGroup "Angabe3"[
     minusTest,
     absTest,         
     mixedTest,
-    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
-    infiniteTest2, -- 5 rows, row 3 is infinite
-    errorTest
+--    infiniteTest1, -- 5 rows, row 2 through 4 are infinite
+--    infiniteTest2, -- 5 rows, row 3 is infinite
+    errorTest,
+    stressTest
     ]
 
 properties :: TestTree
-properties = testGroup "Properties" [ qcProps]
+properties = testGroup "Properties" [ 
+    --qcProps
+    ]
 
 m31 :: Matrix
 m22 :: Matrix
@@ -69,7 +81,16 @@ mk2 = Z (E 2 (LE 1))(LZ (E 10 (E 10 (E 2 (LE 2)))))
 mk3 = Z (E 1(E 1(LE 1))) (LZ (E 1(E 1(E 1 (LE 1)))))
 infiniRow = E 0 infiniRow
 infiniMatrix = Z (LE 1) (Z (E 2 (LE 3)) (Z infiniRow (Z (E (-3)(LE (-2))) (LZ (LE (-1))))))
-infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))                
+infiniMatrix2 = Z (LE 1) (Z infiniRow (Z infiniRow (Z infiniRow (LZ (LE (-1))))))
+
+mkz::Int->Int->Zeile
+mkz x 1 = LE x
+mkz x n = E (n*x) (mkz x (n-1)) 
+mkm::Int->Int->Int->Matrix
+mkm x 1 n = LZ (mkz x n)
+mkm x m n = Z (mkz x n) (mkm x (m-1) n)
+
+
                 
 
 unitTests :: TestTree
@@ -82,17 +103,17 @@ unitTests = testGroup "Unit tests"
       [1, 2, 3] `compare` [1,2,2] @?= LT
   ]
 
-qcProps :: TestTree
-qcProps = testGroup "(checked by QuickCheck)"
-  [ QC.testProperty "sort == sort . reverse" $
-      \list -> sort (list :: [Int]) == sort (reverse list)
-  , QC.testProperty "Fermat's little theorem" $
-      \x -> ((x :: Integer)^7 - x) `mod` 7 == 0
-  -- the following property does not hold
-  , QC.testProperty "Fermat's last theorem" $
-      \x y z n ->
-        (n :: Integer) >= 3 QC.==> x^n + y^n /= (z^n :: Integer)
-  ]
+-- qcProps :: TestTree
+-- qcProps = testGroup "(checked by QuickCheck)"
+--   [ QC.testProperty "sort == sort . reverse" $
+--       \list -> sort (list :: [Int]) == sort (reverse list)
+--   , QC.testProperty "Fermat's little theorem" $
+--       \x -> ((x :: Integer)^7 - x) `mod` 7 == 0
+--   -- the following property does not hold
+--   , QC.testProperty "Fermat's last theorem" $
+--       \x y z n ->
+--         (n :: Integer) >= 3 QC.==> x^n + y^n /= (z^n :: Integer)
+--   ]
 matrixtypTest :: TestTree
 matrixtypTest =
     testGroup
@@ -153,6 +174,7 @@ minusTest =
                 n32 - n32 @?= Z (E 0 (LE 0)) (Z (E 0 (LE 0)) (LZ (E 0 (LE 0)))),
             testCase "3" $                
                 m32 - n32 @?= Z (E (-1) (LE 3)) (Z (E 0 (LE 2)) (LZ (E 11 (LE 0))))
+            
         ]
 absTest :: TestTree
 absTest =
@@ -183,15 +205,15 @@ errorTest =
     testGroup
         "these should fail with \"Argument(e) typfehlerhaft\"\n there are 2 more test groups on matrices with infinite length columns to uncomment at your own discretion (line 17,18) \n "
         [   
-            testCase "1" $
+            testCase "(+) (exception desired)" $
                 m14 + n11 @?= error "Argument(e) typfehlerhaft",
-            testCase "2" $                
+            testCase "(-) (exception desired)" $
                 abs m32-n24 @?= error "Argument(e) typfehlerhaft",
-            testCase "3" $                
+            testCase "(==)(exception desired)" $
                 n24' == m32 @?= error "Argument(e) typfehlerhaft",
-            testCase "4" $                
+            testCase "(==)(exception desired)" $
                 m31 == mk1 @?= error "Argument(e) typfehlerhaft",
-            testCase "5" $                
+            testCase "(/=)(exception desired)" $
                 mk1 /= m31 @?= error "Argument(e) typfehlerhaft"
         ]
 infiniteTest1 :: TestTree
@@ -227,6 +249,27 @@ infiniteTest2 =
                  infiniMatrix2 == infiniMatrix2 @?= error "Argument(e) typfehlerhaft",
              testCase "(/=)(exception desired)" $
                  infiniMatrix2 /= infiniMatrix2 @?= error "Argument(e) typfehlerhaft"  
+        ]
+stressTest :: TestTree
+stressTest =
+    testGroup "stress tests"
+        [   
+            testCase "matrixtyp = (10000, 10000)" $            
+                matrixtyp (mkm 0 10000 10000) @?= Matrix_vom_Typ (10000,10000),
+            testCase "(==),True, (2000,2000)" $                
+                mkm 0 2000 2000==mkm 0 2000 2000 @?= True,
+            testCase "(/=),same instance, instant if based on (==)" $                
+                mkm 0 2000 2000/=mkm 0 2000 2000 @?= False,
+            testCase "(+), (2000,2000)" $                
+                mkm 3 2000 2000 + mkm 2 2000 2000 @?= mkm 5 2000 2000,
+            testCase "(-), (2000,2000)" $                
+                mkm 3 2000 2000 - mkm 1 2000 2000 @?= mkm 2 2000 2000,
+            testCase "abs, (500,500)" $                
+                abs (mkm (-3) 500 500) @?= mkm 3 500 500,
+            testCase "mixed, (500,500)" $                
+                mkm 3 500 500 - abs (mkm (-2) 500 500) + mkm 4 500 500 @?= mkm 5 500 500,
+            testCase "(/=) mismatched matrices (exception desired)" $                
+                mkm 0 20000 20000/=mkm 0 20000 20001 @?= error "Argument(e) typfehlerhaft"
         ]
 
 
