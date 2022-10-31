@@ -3,9 +3,9 @@
  -
  - You can execute the test-suite on g0 via:
  -
-cabal repl -b base -b tasty -b tasty-hunit
-:l Punkte/Angabe1_TestSuite1.hs
-main
+ - > cabal repl -b base -b tasty -b tasty-hunit
+ - > :l Assignment0_TestSuite1.hs
+ - > main
  -
  - It works the same on you local machine.
  - To execute the test with stack *locally* execute:
@@ -19,7 +19,7 @@ main
 -}
 {-# LANGUAGE TupleSections #-}
 
-module Angabe1_TestSuite1 where
+module TestSuite1 where
 
 import Angabe1 hiding (main, repeat, replicate, sort)
 import Data.List (sort)

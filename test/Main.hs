@@ -29,5 +29,6 @@ tests = testGroup "Fprog Tests"
      TestSuite5.spec,
      TestSuite6.spec,
      TestSuite7.spec,
-     Angabe1_TestSuite1.spec
+     Angabe1_TestSuite.spec
+     Angabe2_TestSuite.spec
     ]
