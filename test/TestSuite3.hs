@@ -2,10 +2,8 @@ module TestSuite3 where
 
 import Angabe3
 import Test.Tasty
---import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
 
-import Data.List
 import Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
 
 
@@ -31,7 +29,6 @@ spec = testGroup "Angabe3"[
 
 properties :: TestTree
 properties = testGroup "Properties" [ 
-    --qcProps
     ]
 
 m31 :: Matrix
@@ -93,16 +90,6 @@ mkm x m n = Z (mkz x n) (mkm x (m-1) n)
 
                 
 
-unitTests :: TestTree
-unitTests = testGroup "Unit tests"
-  [ testCase "List comparison (different length)" $
-      [1, 2, 3] `compare` [1,2] @?= GT
-
-  -- the following test does not hold
-  , testCase "List comparison (same length)" $
-      [1, 2, 3] `compare` [1,2,2] @?= LT
-  ]
-
 -- qcProps :: TestTree
 -- qcProps = testGroup "(checked by QuickCheck)"
 --   [ QC.testProperty "sort == sort . reverse" $
@@ -140,16 +127,16 @@ eqTest =
         [   
             testCase "(==),True" $                
                 m32==m32' @?= True,
-            testCase "(==),True" $                
-                m24==m24' @?= True,
             testCase "(==),False" $            
                 m11==n11 @?=  False,
+            testCase "(==),fromInteger(), True" $                
+                1 ==LZ (LE 1) @?= True,
             testCase "(/=),True" $
                 m32/=n32 @?=  True,
             testCase "(/=),True" $            
                 n14/=n14' @?= True,
-            testCase "(/=),False" $                
-                m14/=m14' @?= False
+            testCase "(/=),fromInteger(), True" $                
+                1 /= LZ (LE 0) @?= True
         ]
 plusTest :: TestTree
 plusTest =
@@ -264,10 +251,10 @@ stressTest =
                 mkm 3 1000 1000 + mkm 2 1000 1000 @?= mkm 5 1000 1000,
             testCase "(-), (1000,1000)" $                
                 mkm 3 1000 1000 - mkm 1 1000 1000 @?= mkm 2 1000 1000,
-            testCase "abs, (500,500)" $                
-                abs (mkm (-3) 500 500) @?= mkm 3 500 500,
-            testCase "mixed, (500,500)" $                
-                mkm 3 500 500 - abs (mkm (-2) 500 500) + mkm 4 500 500 @?= mkm 5 500 500,
+            testCase "abs, (1000,1000)" $                
+                abs (mkm (-3) 1000 1000) @?= mkm 3 1000 1000,
+            testCase "mixed, (1000,1000)" $                
+                mkm 3 1000 1000 - abs (mkm (-2) 1000 1000) + mkm 4 1000 1000 @?= mkm 5 1000 1000,
             testCase "(/=) mismatched matrices (exception desired)" $                
                 mkm 0 10000 10000/=mkm 0 10000 10001 @?= error "Argument(e) typfehlerhaft"
         ]

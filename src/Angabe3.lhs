@@ -101,25 +101,32 @@ Knapp, aber gut nachvollziehbar geht die Instanzdeklaration fuer Eq folgendermas
 Aufgabe A.3
 
 
+
+> elemZ :: (Int->Int->Int) -> Zeile -> Zeile -> Zeile
+> elemZ op (LE x)  (LE y)  = LE(op x y)
+> elemZ op (E x xs)(E y ys) = E (op x y)(elemZ op xs ys)
+> elemZ _ _ _ = fehler
+
+> elemM :: (Zeile->Zeile->Zeile) -> Matrix -> Matrix -> Matrix
+> elemM op (LZ x)  (LZ y)  = LZ(op x y)
+> elemM op (Z x xs)(Z y ys) = Z (op x y)(elemM op xs ys)
+> elemM _ _ _ = fehler
+
+
 basic operations on lines and matrices
 
 > instance Num Zeile where
->  (+) :: Zeile -> Zeile -> Zeile
->  (LE x) + (LE y)      = LE (x + y)
->  (E x xs) + (E y ys)  = E (x + y)(xs+ys)
->  _ + _ = fehler
+>  (+),(-) :: Zeile -> Zeile -> Zeile
+>  a + b = elemZ (+) a b
+>  a - b = elemZ (-) a b
 
->  (-) :: Zeile -> Zeile -> Zeile
->  (LE x) - (LE y)      = LE (x - y)
->  (E x xs) - (E y ys)  = E (x - y)(xs-ys)
->  _ - _ = fehler
 
 >  abs :: Zeile -> Zeile
 >  abs (LE x) = LE(abs x)
 >  abs (E x xs) = E (abs x) (abs xs)
 
 >  fromInteger :: Integer -> Zeile
->  fromInteger x = LE (fromIntegral x)
+>  fromInteger x = LE (fromInteger x)
 
 >  (*) :: Zeile -> Zeile -> Zeile
 >  m1 * m2 = error "(*) bleibt unimplementiert!"
@@ -132,27 +139,16 @@ basic operations on lines and matrices
 
 > instance Num Matrix where
 
->  (+) :: Matrix -> Matrix -> Matrix
+>  (+),(-) :: Matrix -> Matrix -> Matrix
 >  a+b
 >   | matrixtyp a == KeineMatrix = fehler
 >   | matrixtyp a /= matrixtyp b = fehler
->   | otherwise = plus a b
->   where 
->   plus :: Matrix -> Matrix -> Matrix
->   plus  (LZ x)  (LZ y)  = LZ(x + y)
->   plus (Z x xs)(Z y ys) = Z (x + y)(plus xs ys)
->   plus _ _ = fehler
+>   | otherwise = elemM (+) a b
 
->  (-) :: Matrix -> Matrix -> Matrix
 >  a-b
 >   | matrixtyp a == KeineMatrix = fehler
 >   | matrixtyp a /= matrixtyp b = fehler
->   | otherwise = minus a b
->   where
->   minus :: Matrix -> Matrix -> Matrix
->   minus  (LZ x)  (LZ y)  = LZ(x - y)
->   minus (Z x xs)(Z y ys) = Z (x - y)(minus xs ys)
->   minus _ _ = fehler
+>   | otherwise = elemM (-) a b
 
 >  abs :: Matrix -> Matrix
 >  abs a
@@ -160,13 +156,10 @@ basic operations on lines and matrices
 >   | otherwise = abs' a
 >   where
 >       abs' (LZ a)   = LZ(abs a)
->       abs' (Z a xs) = Z (abs a) (abs xs)
-
-
-
+>       abs' (Z a xs) = Z (abs a) (abs' xs)
 
 >  fromInteger :: Integer -> Matrix
->  fromInteger z = LZ (LE (fromIntegral z))
+>  fromInteger z = LZ (LE (fromInteger z))
 
 
 >  (*) :: Matrix -> Matrix -> Matrix
