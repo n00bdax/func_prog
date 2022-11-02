@@ -76,22 +76,31 @@ Aufgabe A.1
 Aufgabe A.2
 
 > instance Eq Matrix where
-
 >  (==) :: Matrix -> Matrix -> Bool
 >  a==b
 >   | matrixtyp a == KeineMatrix = fehler
->   | matrixtyp b == KeineMatrix = fehler
->   | otherwise = cMat a b
->   where
->   cMat :: Matrix -> Matrix -> Bool
->   cMat (LZ x)(LZ y)      = cRow x y
->   cMat (Z x xs)(Z y ys)   = cRow x y && cMat xs ys
->   cMat _ _ = fehler
+>   | matrixtyp a /= matrixtyp b = fehler
+>   | otherwise = compareMats a b
 
->   cRow :: Zeile -> Zeile -> Bool
->   cRow (LE x)(LE y)       = x == y
->   cRow (E x xs)(E y ys)   = x == y && cRow xs ys
->   cRow _ _ = fehler
+global helper function without checks
+
+> compareMats :: Matrix -> Matrix -> Bool
+> compareMats (LZ x)(LZ y)      = x==y
+> compareMats (Z x xs)(Z y ys)   = x==y &&  compareMats xs ys
+> compareMats _ _ = fehler
+
+> instance Eq Zeile where
+>  (==) :: Zeile -> Zeile -> Bool
+>  a==b
+>   | getWidth a /= getWidth b = fehler
+>   | otherwise = compareRows a b
+
+global helper function without checks
+
+> compareRows :: Zeile -> Zeile -> Bool
+> compareRows (LE x)(LE y)      = x==y
+> compareRows (E x xs)(E y ys)   = x==y &&  compareRows xs ys
+> compareRows _ _ = fehler
 
 
 
@@ -101,29 +110,32 @@ Knapp, aber gut nachvollziehbar geht die Instanzdeklaration fuer Eq folgendermas
 Aufgabe A.3
 
 
+global helper functions wihtout checks for
+emelentwise calculations
 
 > elemZ :: (Int->Int->Int) -> Zeile -> Zeile -> Zeile
-> elemZ op (LE x)  (LE y)  = LE(op x y)
+> elemZ op (LE x)  (LE y)   = LE(op x y)
 > elemZ op (E x xs)(E y ys) = E (op x y)(elemZ op xs ys)
 > elemZ _ _ _ = fehler
 
 > elemM :: (Zeile->Zeile->Zeile) -> Matrix -> Matrix -> Matrix
-> elemM op (LZ x)  (LZ y)  = LZ(op x y)
+> elemM op (LZ x)  (LZ y)   = LZ(op x y)
 > elemM op (Z x xs)(Z y ys) = Z (op x y)(elemM op xs ys)
 > elemM _ _ _ = fehler
 
 
-basic operations on lines and matrices
+
+basic operations on matrices
 
 > instance Num Zeile where
+
 >  (+),(-) :: Zeile -> Zeile -> Zeile
 >  a + b = elemZ (+) a b
 >  a - b = elemZ (-) a b
 
-
 >  abs :: Zeile -> Zeile
 >  abs (LE x) = LE(abs x)
->  abs (E x xs) = E (abs x) (abs xs)
+>  abs (E x xs) = E (abs x)(abs xs)
 
 >  fromInteger :: Integer -> Zeile
 >  fromInteger x = LE (fromInteger x)
@@ -132,7 +144,10 @@ basic operations on lines and matrices
 >  m1 * m2 = error "(*) bleibt unimplementiert!"
 
 >  negate :: Zeile -> Zeile
->  negate m = error "negate bleibt unimplementiert!"
+>  negate a = error "(*) bleibt unimplementiert!"
+
+  negate (LE x) = LE(-x)
+  negate (E x xs) = E (-x)(negate xs)
 
 >  signum :: Zeile -> Zeile
 >  signum m = error "signum bleibt unimplementiert!"
@@ -166,7 +181,10 @@ basic operations on lines and matrices
 >  m1 * m2 = error "(*) bleibt unimplementiert!"
 
 >  negate :: Matrix -> Matrix
->  negate m = error "negate bleibt unimplementiert!"
+>  negate a = error "(*) bleibt unimplementiert!"
+
+  negate (LZ x) = LZ(negate x)
+  negate (Z x xs) = Z (negate x)(negate xs)
 
 >  signum :: Matrix -> Matrix
 >  signum m = error "signum bleibt unimplementiert!"
