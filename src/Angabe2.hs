@@ -1,4 +1,5 @@
 {-# LANGUAGE InstanceSigs #-}
+
 module Angabe2 where
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
@@ -11,34 +12,48 @@ module Angabe2 where
 
 -- Fuer A.1 bis A.4
 
-data Lotterielos = Treffer 
-                   | Niete 
-                   | Freilos deriving (Eq,Show)
- 
-data Liste = Schluss Lotterielos
-             | Kopf Lotterielos Liste deriving (Eq,Show)
+data Lotterielos
+  = Treffer
+  | Niete
+  | Freilos
+  deriving (Eq, Show)
 
-data Baum = Blatt Lotterielos
-            | Gabel Baum Lotterielos Baum deriving (Eq,Show)
+data Liste
+  = Schluss Lotterielos
+  | Kopf Lotterielos Liste
+  deriving (Eq, Show)
 
-data Liste' = Schluss' Baum
-              | Kopf' Baum Liste' deriving (Eq,Show)
+data Baum
+  = Blatt Lotterielos
+  | Gabel Baum Lotterielos Baum
+  deriving (Eq, Show)
 
-data Baum' = Blatt' Liste
-             | Gabel' Baum' Liste Baum' deriving (Eq,Show)
+data Liste'
+  = Schluss' Baum
+  | Kopf' Baum Liste'
+  deriving (Eq, Show)
 
-type Loswert    = Lotterielos
+data Baum'
+  = Blatt' Liste
+  | Gabel' Baum' Liste Baum'
+  deriving (Eq, Show)
+
+type Loswert = Lotterielos
+
 type Auswertung = Ordering
 
 -- Aufgabe A.1
 analysiere :: Liste -> Loswert -> Loswert -> Auswertung
 analysiere = analyze
+
 -- Aufgabe A.2
 analysiere' :: Baum -> Loswert -> Loswert -> Auswertung
 analysiere' = analyze
+
 -- Aufgabe A.3
 analysiere'' :: Liste' -> Loswert -> Loswert -> Auswertung
 analysiere'' = analyze
+
 -- Aufgabe A.4
 analysiere''' :: Baum' -> Loswert -> Loswert -> Auswertung
 analysiere''' = analyze
@@ -48,28 +63,27 @@ class DatStruct a where
   analyze :: a -> Loswert -> Loswert -> Auswertung
   analyze a first second
     | first == second = EQ
-    | otherwise = compare (count a first)(count a second)
+    | otherwise = compare (count a first) (count a second)
 
 instance DatStruct Liste where
   count :: Liste -> Lotterielos -> Int
-  count (Schluss x) y = fromEnum (x==y)
-  count (Kopf x xs) y = count xs y + fromEnum (x==y)
+  count (Schluss x) y = fromEnum (x == y)
+  count (Kopf x xs) y = count xs y + fromEnum (x == y)
 
 instance DatStruct Liste' where
   count :: Liste' -> Lotterielos -> Int
   count (Schluss' x) y = count x y
   count (Kopf' x xs) y = count xs y + count x y
-  
+
 instance DatStruct Baum where
   count :: Baum -> Lotterielos -> Int
-  count (Blatt x) y = fromEnum (x==y)
-  count (Gabel a x b) y = count a y +  fromEnum (x==y) + count b y
+  count (Blatt x) y = fromEnum (x == y)
+  count (Gabel a x b) y = count a y + fromEnum (x == y) + count b y
 
 instance DatStruct Baum' where
   count :: Baum' -> Lotterielos -> Int
   count (Blatt' x) y = count x y
   count (Gabel' a x b) y = count a y + count x y + count b y
-  
 
 {-
 analysiere* vergleicht Werte
@@ -77,14 +91,14 @@ count zaehlt Werte ab
 
 -}
 
---debug variables
+-- debug variables
 {-
 l1::Liste
 l1= Kopf Freilos(Kopf Treffer (Kopf Treffer (Kopf Niete (Schluss Niete))))
 -- 2 Treffer, 1 Freilos, 2 Niete
 
 l2::Liste
-l2= Kopf Freilos(Kopf Treffer (Kopf Treffer (Kopf Niete (Kopf Niete(Kopf Treffer (Kopf Treffer (Kopf Niete (Schluss Niete))))))))   
+l2= Kopf Freilos(Kopf Treffer (Kopf Treffer (Kopf Niete (Kopf Niete(Kopf Treffer (Kopf Treffer (Kopf Niete (Schluss Niete))))))))
 -- 4 Treffer, 1 Freilos, 4 Niete
 
 l3 :: Liste
@@ -119,4 +133,3 @@ b2'::Baum'
 b2' = Gabel' (Blatt' l1) l2 (Gabel' (Blatt' l2) l2 (Blatt' l1))
 -- 14 Treffer, 1 Freilos, 14 Niete
 -}
-
