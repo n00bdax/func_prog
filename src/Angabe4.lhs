@@ -132,6 +132,12 @@ getter functions for Datensatz
 > getSkonto (DS {skonto = x}) = x
 > getSkonto _ = Kein_Skonto
 
+> dropZeroes :: (Integral a) => [a] -> [a]
+> dropZeroes (0:xs) = dropZeroes xs
+> dropZeroes (x:xs) = x : dropZeroes xs
+> dropZeroes [] = []
+
+
 
     
     
