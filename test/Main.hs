@@ -11,7 +11,7 @@ import qualified TestSuite1
 import qualified Angabe1_TestSuite
 import qualified TestSuite2
 import qualified Angabe2_TestSuite
---import qualified TestSuite3
+import qualified TestSuite3
 --import qualified Angabe3_TestSuite
 --import qualified TestSuite4
 --import qualified Angabe4_TestSuite
@@ -32,7 +32,7 @@ tests = testGroup "Fprog Tests"
     ,Angabe1_TestSuite.spec
     ,TestSuite2.spec
     ,Angabe2_TestSuite.spec
---    ,TestSuite3.spec
+    ,TestSuite3.spec
 --    ,Angabe3_TestSuite.spec
 --    ,TestSuite4.spec
 --    ,Angabe4_TestSuite.spec

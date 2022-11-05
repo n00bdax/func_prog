@@ -137,19 +137,28 @@ getter functions for Datensatz
 > dropZeroes (x:xs) = x : dropZeroes xs
 > dropZeroes [] = []
 
+> impossibleFunction :: Lieferanten
+> impossibleFunction _ _ = notAvailable
 
-
-    
-    
-    
 Aufgabe A.1
 
 
+ sofort_erhaeltlich_bei :: Suchanfrage -> Lieferanten  -> Lieferantenliste
+ sofort_erhaeltlich_bei= hasInStock lfrntn
+   where
+   hasInStock :: Lieferantenliste -> Typ -> Lieferanten -> Lieferantenliste
+   hasInStock (x:xs)
+       | checkStock x = x : hasInStock xs
+       | otherwise = hasInStock xs
+   hasInStock _= []
+   checkStock :: Lieferantenname -> Typ -> Lieferanten -> Bool
+   checkStock n1 (WM t1) (impossibleFunction n2 (WMS {wm = wm})) = n1==n2 && (wm t1 == ds) && getInStock ds > 0
+   checkStock _ _ _ = False
 
-> sofort_erhaeltlich_bei :: Suchanfrage -> Lieferanten  -> Lieferantenliste
-> sofort_erhaeltlich_bei = error "noch nicht implementiert"
+ 
+   checkStock :: Lieferantenname -> Typ -> Lieferanten -> Bool
 
-> --sofort_erhaeltlich_bei = dropWhile (==0) [ getCurrentStock x (getData y) | y <- lfrntn]
+
 
 
  Knapp, aber gut nachvollziebar, geht die Implementierung folgenderma�en vor:
@@ -182,7 +191,10 @@ Aufgabe A.4
 
 > type RabattierterPreis = EUR
 
-> guenstigste_Lieferanten_im_Lieferfenster ::  Suchanfrage -> Lieferfenster -> Stueckzahl -> [(Lieferantenname,RabattierterPreis)]
+> guenstigste_Lieferanten_im_Lieferfenster ::
+>   Suchanfrage -> Lieferfenster -> Stueckzahl 
+>   -> [(Lieferantenname,RabattierterPreis)]
+
 > guenstigste_Lieferanten_im_Lieferfenster = error "noch nicht implementiert"
 
 

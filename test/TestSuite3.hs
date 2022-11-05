@@ -5,6 +5,27 @@ import           Test.Tasty
 import           Test.Tasty.HUnit
 import           Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
 
+
+
+import Control.Exception (ErrorCall(ErrorCallWithLocation), try, evaluate)
+
+getMsg :: ErrorCall -> String
+getMsg (ErrorCallWithLocation msg _) = msg
+
+assertError :: (Show a) => String -> a -> IO ()
+assertError errorMsg action = do
+    r <- try (evaluate action)
+    case r of
+        Left e -> if getMsg e == errorMsg then return()
+                  else assertFailure $ "Received unexpected error: " ++ show e ++ "\ninstead of: " ++ errorMsg
+        Right _ -> assertFailure $ "Expected error: " ++ errorMsg
+
+
+
+
+
+
+
 main :: IO ()
 main =
   defaultMainWithIngredients
@@ -15,16 +36,16 @@ spec :: TestTree
 spec =
   testGroup
     "Angabe3"
-    [ matrixtypTest,
-      eqTest,
-      plusTest,
-      minusTest,
-      absTest,
-      mixedTest
-      --    ,infiniteTest1 -- 5 rows, row 2 through 4 are infinite
-      --    ,infiniteTest2 -- 5 rows, row 3 is infinite
-      --    ,errorTest
-      --    ,stressTest
+    [ matrixtypTest
+      ,eqTest
+      ,plusTest
+      ,minusTest
+      ,absTest
+      ,mixedTest
+      ,infiniteTest1 -- 5 rows, row 2 through 4 are infinite
+      ,infiniteTest2 -- 5 rows, row 3 is infinite
+      ,errorTest
+      ,stressTest
     ]
 
 properties :: TestTree
@@ -188,16 +209,16 @@ mixedTest =
         n24' - abs n24'    @?= Z (E (-22) (E (-198) (E 0 (LE (-2462))))) (LZ (E (-22) (E 0 (E (-17776) (LE (-4))))))
     ]
 
-{-
+
 errorTest :: TestTree
 errorTest =
   testGroup
     "these should fail with \"Argument(e) typfehlerhaft\"\n there are 2 more test groups on matrices with infinite length columns to uncomment at your own discretion (line 17,18) \n "
-    [ testCase "(+) (exception desired)" $ assertError "Argument(e) typfehlerhaft" (m14 + n11),
-      testCase "(-) (exception desired)" $ assertError "Argument(e) typfehlerhaft" (abs m32 - n24),
-      testCase "(==)(exception desired)" $ assertError "Argument(e) typfehlerhaft" (n24' == m32),
-      testCase "(==)(exception desired)" $ assertError "Argument(e) typfehlerhaft" (m31 == mk1),
-      testCase "(/=)(exception desired)" $ assertError "Argument(e) typfehlerhaft" (mk1 /= m31)
+    [ testCase "(+) (error)" $ assertError "Argument(e) typfehlerhaft" (m14 + n11),
+      testCase "(-) (error)" $ assertError "Argument(e) typfehlerhaft" (abs m32 - n24),
+      testCase "(==)(error)" $ assertError "Argument(e) typfehlerhaft" (n24' == m32),
+      testCase "(==)(error)" $ assertError "Argument(e) typfehlerhaft" (m31 == mk1),
+      testCase "(/=)(error)" $ assertError "Argument(e) typfehlerhaft" (mk1 /= m31)
     ]
 
 infiniteTest1 :: TestTree
@@ -206,11 +227,11 @@ infiniteTest1 =
     "row 3/5 is infinite"
     [ testCase "matrixtyp (succeeds or recurses infinitely)" $
         matrixtyp infiniMatrix @?= KeineMatrix,
-      testCase "(+) (exception desired)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix + m32),
-      testCase "(-) (exception desired)" $ assertError "Argument(e) typfehlerhaft" (n24' - infiniMatrix),
-      testCase "abs (exception desired)" $ assertError "Argument(e) typfehlerhaft" (abs infiniMatrix),
-      testCase "(==)(exception desired)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix == infiniMatrix),
-      testCase "(/=)(exception desired)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix /= infiniMatrix)
+      testCase "(+) (error)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix + m32),
+      testCase "(-) (error)" $ assertError "Argument(e) typfehlerhaft" (n24' - infiniMatrix),
+      testCase "abs (error)" $ assertError "Argument(e) typfehlerhaft" (abs infiniMatrix),
+      testCase "(==)(error)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix == infiniMatrix),
+      testCase "(/=)(error)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix /= infiniMatrix)
     ]
 
 infiniteTest2 :: TestTree
@@ -218,11 +239,11 @@ infiniteTest2 =
   testGroup
     "rows 1 and 5 are safe - 2,3,4 are infinite"
     [ testCase "matrixtyp (succeeds or recurses infinitely)" $ matrixtyp infiniMatrix2 @?= KeineMatrix,
-      testCase "(+) (exception desired)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix2 + m32),
-      testCase "(-) (exception desired)" $ assertError "Argument(e) typfehlerhaft" (n24' - infiniMatrix2),
-      testCase "abs (exception desired)" $ assertError "Argument(e) typfehlerhaft" (abs infiniMatrix2),
-      testCase "(==)(exception desired)" $ assertError "Arguent(e) typfehlerhaft" (infiniMatrix2 == infiniMatrix2),
-      testCase "(/=)(exception desired)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix2 /= infiniMatrix2)
+      testCase "(+) (error)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix2 + m32),
+      testCase "(-) (error)" $ assertError "Argument(e) typfehlerhaft" (n24' - infiniMatrix2),
+      testCase "abs (error)" $ assertError "Argument(e) typfehlerhaft" (abs infiniMatrix2),
+      testCase "(==)(error)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix2 == infiniMatrix2),
+      testCase "(/=)(error)" $ assertError "Argument(e) typfehlerhaft" (infiniMatrix2 /= infiniMatrix2)
     ]
 
 stressTest :: TestTree
@@ -244,6 +265,6 @@ stressTest =
       testCase "mixed, (1000,1000)" $
         mkm 3 1000 1000 - abs (mkm (-2) 1000 1000) + mkm 4 1000 1000 @?= mkm 5 1000 1000,
       testCase "(/=) mismatched matrices (exception desired)" $
-        assertError "Argument(e) typfehlerhaft" (mkm 0 10000 10000 /= mkm 0 10000 10001)
+        assertError "Argument(e) typfehlerhaft" (mkm 1 10000000 1 /= mkm 2 10000001 1)
     ]
- -}
+ 
