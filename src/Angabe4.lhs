@@ -1,8 +1,7 @@
 > {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 > {-# HLINT ignore "Use camelCase" #-}
-
- {-# LANGUAGE OverloadedRecordDot #-}
- {-# LANGUAGE DuplicateRecordFields #-}
+> {-# LANGUAGE OverloadedRecordDot #-}
+> {-# LANGUAGE DuplicateRecordFields #-}
 
 
 
@@ -60,17 +59,55 @@
 >   deriving (Eq, Bounded, Enum, Show)
 
 > type Lieferantenliste = [Lieferantenname]
-> lfrntn :: Lieferantenliste
-> lfrntn = [(L1)..(L10)]
 
 > type Lieferanten = Lieferantenname -> Sortiment -> Datensatz
 
 > type Suchanfrage = Typ
 
+----------------------------------------------------------------------------------
+                                    utilities
+----------------------------------------------------------------------------------
+
+> lfrntn :: Lieferantenliste
+> lfrntn = [(L1)..(L10)]
+
+getter functions for Datensatz
+
+> getPrice :: Datensatz -> Nat1
+> getPrice (DS {preis_in_euro = x}) = x
+> getPrice _ = 0
+
+> getInStock :: Datensatz -> Nat0
+> getInStock (DS {sofort_lieferbare_stueckzahl = x}) = x
+> getInStock _ = 0
+
+> isInStock :: Datensatz -> Bool
+> isInStock (DS {sofort_lieferbare_stueckzahl = 1}) = True
+> isInStock _ = False
+
+> getInStockBy :: Datensatz -> (Lieferfenster -> Nat0)
+> getInStockBy (DS {lieferbare_stueckzahl_im_Zeitfenster = x}) = x
+> getInStockBy _ = neverInStock
+
+> neverInStock :: Lieferfenster -> Nat0
+> neverInStock _ = 0
+
+> getSkonto :: Datensatz -> Skonto
+> getSkonto (DS {skonto = x}) =x
+> getSkonto _ = Kein_Skonto
+
+> dropZeroes :: (Integral a) => [a] -> [a]
+> dropZeroes (0:xs) = dropZeroes xs
+> dropZeroes (x:xs) = x : dropZeroes xs
+> dropZeroes [] = []
 
 
 
-avilability patterns
+
+
+
+
+avilability patterns for testing 
 
 restocks:
 availA  never
@@ -116,49 +153,41 @@ assortments
 > db1 _ _ = notAvailable 
 
 
-getter functions for Datensatz
-
-> getPrice :: Datensatz -> Nat1
-> getPrice (DS {preis_in_euro = x}) = x
-> getPrice _ = 0
-
-> getInStock :: Datensatz -> Nat0
-> getInStock (DS {sofort_lieferbare_stueckzahl = x}) = x
-> getInStock _ = 0
-
-> isInStock :: Datensatz -> Bool
-> isInStock (DS {sofort_lieferbare_stueckzahl = 1}) = True
-> isInStock _ = False
-
-> getInStockBy :: Datensatz -> (Lieferfenster -> Nat0)
-> getInStockBy (DS {lieferbare_stueckzahl_im_Zeitfenster = x}) = x
-> getInStockBy _ = neverInStock
-
-> neverInStock :: Lieferfenster -> Nat0
-> neverInStock _ = 0
-
-> getSkonto :: Datensatz -> Skonto
-> getSkonto (DS {skonto = x}) =x
-> getSkonto _ = Kein_Skonto
-
-> dropZeroes :: (Integral a) => [a] -> [a]
-> dropZeroes (0:xs) = dropZeroes xs
-> dropZeroes (x:xs) = x : dropZeroes xs
-> dropZeroes [] = []
 
 
 
+        f :: Sortiment -> Waschmaschinentyp -> Datensatz
+        f = wm
+        has a name (WM typ) = getInStock (a (name wm typ))>0
+        has a name (WT typ) = getInStock (a (name wt typ))>0
+        has a name (WS typ) = getInStock (a (name ws typ))>0
+        has _ _ _ = False
 
- > f :: Sortiment -> Waschmaschinentyp -> Datensatz
- > f = wm
- 
- 
- > has a name (WM typ) = getInStock (a (name wm typ))>0
- > has a name (WT typ) = getInStock (a (name wt typ))>0
- > has a name (WS typ) = getInStock (a (name ws typ))>0
- > has _ _ _ = False
+> gg :: Typ -> Sortiment
+> gg (WM _) = WMS {wm = nopeM}
+> gg (WT _) = WTS {wt = nopeT}
+> gg (WS _) = WSS {ws = nopeS}
 
+> nope :: Typ -> Datensatz
+> nope _ = notAvailable
+> notNope :: Typ -> Datensatz
+> notNope _ = ds1
 
+> sortM, sortT, sortS :: Sortiment
+> sortM = WMS {wm = nopeM}
+> sortT = WTS {wt = nopeT}
+> sortS = WSS {ws = nopeS}
+
+> nopeM ::Waschmaschinentyp -> Datensatz
+> nopeM _ = notAvailable
+> nopeT ::Waeschetrocknertyp -> Datensatz
+> nopeT _ = notAvailable
+> nopeS ::Waescheschleudertyp -> Datensatz
+> nopeS _ = notAvailable
+
+> aa :: Waschmaschinentyp -> Datensatz
+> aa WM_Typ1 = nopeM WM_Typ1
+> aa _ = notAvailable 
 
 Aufgabe A.1
 
@@ -171,8 +200,9 @@ Aufgabe A.1
 >     | has x typ a = x : checkFor a typ xs
 >     | otherwise = checkFor a typ xs
 >   checkFor _ _ _ = []
+
 >   has :: Lieferantenname -> Typ -> Lieferanten -> Bool
->   has name (WM typ) a = isInStock(a name (WMS wm ))
+>   has name (WM typ) a = isInStock(a name (wm typ))
 >   has _ _ _ = False
 
 
