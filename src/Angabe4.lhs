@@ -1,6 +1,11 @@
 > {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 > {-# HLINT ignore "Use camelCase" #-}
 
+ {-# LANGUAGE OverloadedRecordDot #-}
+ {-# LANGUAGE DuplicateRecordFields #-}
+
+
+
 > module Angabe4 where
 
 1. Vervollständigen Sie gemaess Angabentext!
@@ -121,6 +126,10 @@ getter functions for Datensatz
 > getInStock (DS {sofort_lieferbare_stueckzahl = x}) = x
 > getInStock _ = 0
 
+> isInStock :: Datensatz -> Bool
+> isInStock (DS {sofort_lieferbare_stueckzahl = 1}) = True
+> isInStock _ = False
+
 > getInStockBy :: Datensatz -> (Lieferfenster -> Nat0)
 > getInStockBy (DS {lieferbare_stueckzahl_im_Zeitfenster = x}) = x
 > getInStockBy _ = neverInStock
@@ -129,7 +138,7 @@ getter functions for Datensatz
 > neverInStock _ = 0
 
 > getSkonto :: Datensatz -> Skonto
-> getSkonto (DS {skonto = x}) = x
+> getSkonto (DS {skonto = x}) =x
 > getSkonto _ = Kein_Skonto
 
 > dropZeroes :: (Integral a) => [a] -> [a]
@@ -137,13 +146,37 @@ getter functions for Datensatz
 > dropZeroes (x:xs) = x : dropZeroes xs
 > dropZeroes [] = []
 
-> impossibleFunction :: Lieferanten
-> impossibleFunction _ _ = notAvailable
+
+
+
+ > f :: Sortiment -> Waschmaschinentyp -> Datensatz
+ > f = wm
+ 
+ 
+ > has a name (WM typ) = getInStock (a (name wm typ))>0
+ > has a name (WT typ) = getInStock (a (name wt typ))>0
+ > has a name (WS typ) = getInStock (a (name ws typ))>0
+ > has _ _ _ = False
+
+
 
 Aufgabe A.1
 
 
- sofort_erhaeltlich_bei :: Suchanfrage -> Lieferanten  -> Lieferantenliste
+> sofort_erhaeltlich_bei :: Suchanfrage -> Lieferanten  -> Lieferantenliste
+> sofort_erhaeltlich_bei typ a = checkFor a typ lfrntn
+>   where
+>   checkFor :: Lieferanten -> Typ -> Lieferantenliste -> Lieferantenliste
+>   checkFor a typ (x:xs)
+>     | has x typ a = x : checkFor a typ xs
+>     | otherwise = checkFor a typ xs
+>   checkFor _ _ _ = []
+>   has :: Lieferantenname -> Typ -> Lieferanten -> Bool
+>   has name (WM typ) a = isInStock(a name (WMS wm ))
+>   has _ _ _ = False
+
+
+
  sofort_erhaeltlich_bei= hasInStock lfrntn
    where
    hasInStock :: Lieferantenliste -> Typ -> Lieferanten -> Lieferantenliste
@@ -152,8 +185,7 @@ Aufgabe A.1
        | otherwise = hasInStock xs
    hasInStock _= []
    checkStock :: Lieferantenname -> Typ -> Lieferanten -> Bool
-   checkStock n1 (WM t1) (impossibleFunction n2 (WMS {wm = wm})) = n1==n2 && (wm t1 == ds) && getInStock ds > 0
-   checkStock _ _ _ = False
+   checkStock name (WM typ) x = getInStock2(x name typ)>0 
 
  
    checkStock :: Lieferantenname -> Typ -> Lieferanten -> Bool

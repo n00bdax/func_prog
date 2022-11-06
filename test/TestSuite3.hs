@@ -264,7 +264,7 @@ stressTest =
         abs (mkm (-3) 1000 1000) @?= mkm 3 1000 1000,
       testCase "mixed, (1000,1000)" $
         mkm 3 1000 1000 - abs (mkm (-2) 1000 1000) + mkm 4 1000 1000 @?= mkm 5 1000 1000,
-      testCase "(/=) mismatched matrices (exception desired)" $
-        assertError "Argument(e) typfehlerhaft" (mkm 1 10000000 1 /= mkm 2 10000001 1)
+      testCase "(/=) (1000,1000),(1000,999) (error)" $
+        assertError "Argument(e) typfehlerhaft" (mkm 2 1000 1000 /= mkm 1 1000 999)
     ]
  
