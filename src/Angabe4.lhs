@@ -60,7 +60,7 @@
 
 > type Lieferantenliste = [Lieferantenname]
 
-> type Lieferanten = Lieferantenname -> Sortiment -> Datensatz
+> type Lieferanten = Lieferantenname -> Sortiment
 
 > type Suchanfrage = Typ
 
@@ -146,11 +146,12 @@ assortments
 > ds5 = DS 5 3 availA Kein_Skonto
 > notAvailable = DS 0 0 availA Kein_Skonto
 
-> db1 :: Lieferanten
-> db1 L1 assA = ds1
-> db1 L2 assA = ds2
-> db1 L3 assA = ds3
-> db1 _ _ = notAvailable 
+      this is bunk now
+  > db1 :: Lieferanten
+  > db1 L1 assA = ds1
+  > db1 L2 assA = ds2
+  > db1 L3 assA = ds3
+  > db1 _ _ = notAvailable 
 
 
 
@@ -189,6 +190,9 @@ assortments
 > aa WM_Typ1 = nopeM WM_Typ1
 > aa _ = notAvailable 
 
+
+> sdfghx = WMS
+
 Aufgabe A.1
 
 
@@ -197,13 +201,13 @@ Aufgabe A.1
 >   where
 >   checkFor :: Lieferanten -> Typ -> Lieferantenliste -> Lieferantenliste
 >   checkFor a typ (x:xs)
->     | has x typ a = x : checkFor a typ xs
+>     | has (a x) typ = x : checkFor a typ xs
 >     | otherwise = checkFor a typ xs
 >   checkFor _ _ _ = []
 
->   has :: Lieferantenname -> Typ -> Lieferanten -> Bool
->   has name (WM typ) a = isInStock(a name (wm typ))
->   has _ _ _ = False
+>   has :: Sortiment -> Typ  -> Bool
+>   has (WMS {wm=wm}) (WM typ) =  getInStock(wm typ) > 0
+>   has _ _ = False
 
 
 
@@ -253,10 +257,7 @@ Aufgabe A.4
 
 > type RabattierterPreis = EUR
 
-> guenstigste_Lieferanten_im_Lieferfenster ::
->   Suchanfrage -> Lieferfenster -> Stueckzahl 
->   -> [(Lieferantenname,RabattierterPreis)]
-
+> guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Lieferanten -> [(Lieferantenname,RabattierterPreis)]
 > guenstigste_Lieferanten_im_Lieferfenster = error "noch nicht implementiert"
 
 

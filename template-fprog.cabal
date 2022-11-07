@@ -49,6 +49,8 @@ test-suite fprog-tests
     TestSuite5
     TestSuite6
     TestSuite7
+    Angabe1_TestSuite
+    Angabe2_TestSuite
 
   ghc-options:      -Wall
   build-depends:
