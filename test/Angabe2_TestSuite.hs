@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
-
 module Angabe2_TestSuite where
 
 import Angabe2 hiding

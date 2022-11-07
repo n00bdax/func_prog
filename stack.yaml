@@ -9,3 +9,11 @@ resolver: lts-18.28
 
 packages:
 - .
+tests:
+  so-mve-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - ...
+    dependencies:
+    - HUnit
