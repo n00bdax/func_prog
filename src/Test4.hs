@@ -51,17 +51,27 @@ lieferanten name = case name of
   L10 -> lieferanten L1
   _ -> WMS (const Nicht_im_Sortiment)
 
+lieferantenEmpty :: Lieferantenname -> Sortiment
+lieferantenEmpty _ = WSS $ const Nicht_im_Sortiment
+
+lieferantenEmptyFenster :: Lieferantenname -> Sortiment
+lieferantenEmptyFenster _ = WTS (\t -> DS 130 0 (const 0) ZehnProzent)
+
 tests = [
+  sofort_erhaeltlich_bei (WM WM_Typ5) lieferantenEmpty ~?= [],
   sofort_erhaeltlich_bei (WM WM_Typ5) lieferanten ~?= [L1,L2,L4,L5,L10],
   sofort_erhaeltlich_bei (WS WS_Typ1) lieferanten ~?= [L3],
   sofort_erhaeltlich_bei (WS WS_Typ3) lieferanten ~?= [],
   sofort_erhaeltlich_bei (WT WT_Typ4) lieferanten ~?= [],
 
+  sofort_erhaeltliche_Stueckzahl (WM WM_Typ2) lieferantenEmpty ~?= (0, 0),
   sofort_erhaeltliche_Stueckzahl (WM WM_Typ2) lieferanten ~?= (4, 300),
   sofort_erhaeltliche_Stueckzahl (WS WS_Typ1) lieferanten ~?= (2, 117*2),
   sofort_erhaeltliche_Stueckzahl (WS WS_Typ3) lieferanten ~?= (0, 0),
   sofort_erhaeltliche_Stueckzahl (WT WT_Typ3) lieferanten ~?= (0, 0),
 
+  guenstigste_Lieferanten (WM WM_Typ1) (LF Q1 2023) lieferantenEmpty ~?= Nothing,
+  guenstigste_Lieferanten (WM WM_Typ1) (LF Q1 2023) lieferantenEmptyFenster ~?= Nothing,
   guenstigste_Lieferanten (WM WM_Typ1) (LF Q1 2023) lieferanten ~?= Just [L2,L4,L5],
   guenstigste_Lieferanten (WM WM_Typ1) (LF Q2 2025) lieferanten ~?= Nothing,
   guenstigste_Lieferanten (WM WM_Typ4) (LF Q1 2023) lieferanten ~?= Just [L1,L10],
@@ -69,6 +79,8 @@ tests = [
   guenstigste_Lieferanten (WT WT_Typ4) (LF Q1 2025) lieferanten ~?= Just [L9],
   guenstigste_Lieferanten (WT WT_Typ4) (LF Q1 9999) lieferanten ~?= Nothing,
 
+  guenstigste_Lieferanten_im_Lieferfenster (WS WS_Typ1) (LF Q2 2023) 4 lieferantenEmpty ~?= [],
+  guenstigste_Lieferanten_im_Lieferfenster (WS WS_Typ1) (LF Q2 2023) 4 lieferantenEmptyFenster ~?= [],
   guenstigste_Lieferanten_im_Lieferfenster (WM WM_Typ1) (LF Q1 2023) 999 lieferanten ~?= [],
   guenstigste_Lieferanten_im_Lieferfenster (WM WM_Typ4) (LF Q1 2025) 3 lieferanten ~?= [],
   guenstigste_Lieferanten_im_Lieferfenster (WM WM_Typ4) (LF Q1 2025) 2 lieferanten ~?= [(L2, EUR 179),(L4, EUR 179),(L5, EUR 179)],

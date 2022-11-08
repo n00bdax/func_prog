@@ -5,6 +5,7 @@
 
 
 > module Angabe4 where
+
 > import Data.Maybe
   
 1. Vervollständigen Sie gemaess Angabentext!
@@ -24,6 +25,7 @@
 >                | DreiProzent  
 >                | FuenfProzent 
 >                | ZehnProzent
+>   deriving (Eq, Bounded, Enum, Show, Ord)
 
 > data Waschmaschinentyp   = WM_Typ1 | WM_Typ2 | WM_Typ3 | WM_Typ4 | WM_Typ5
 >   deriving (Eq, Bounded,Enum,Show)
@@ -34,10 +36,12 @@
 
 > data Typ =   WM Waschmaschinentyp
 >            | WT Waeschetrocknertyp
->            | WS Waescheschleudertyp
+>            | WS Waescheschleudertyp deriving (Eq, Show)
 
-> data Quartal       = Q1 | Q2 | Q3 | Q4 deriving (Eq,Ord,Show)
+> data Quartal       = Q1 | Q2 | Q3 | Q4
+>   deriving (Eq,Ord,Show,Enum, Bounded)
 > type Jahr          = Nat2023
+
 > data Lieferfenster = LF { quartal :: Quartal,
 >                           jahr    :: Jahr 
 >                         } deriving (Eq, Ord, Show)
@@ -73,20 +77,20 @@
 
 getter functions for Datensatz
 
-> getPrice :: Datensatz -> Nat1
-> getPrice (DS x _ _ _) = x
-> getPrice _ = 0
+> gPrice :: Datensatz -> Nat1
+> gPrice (DS x _ _ _) = x
+> gPrice _ = 0
 
-> getPriceRed :: (Fractional a) => Datensatz -> a
-> getPriceRed (DS x _ _ DreiProzent)  = fromIntegral x * 0.97
-> getPriceRed (DS x _ _ FuenfProzent) = fromIntegral x * 0.95
-> getPriceRed (DS x _ _ ZehnProzent)  = fromIntegral x * 0.9
-> getPriceRed (DS x _ _ _)  = fromIntegral x
-> getPriceRed _ = 0
+> gPriceRed :: (Num a, Fractional a) => Datensatz -> a
+> gPriceRed (DS x _ _ DreiProzent)  = fromIntegral x * 0.97
+> gPriceRed (DS x _ _ FuenfProzent) = fromIntegral x * 0.95
+> gPriceRed (DS x _ _ ZehnProzent)  = fromIntegral x * 0.9
+> gPriceRed (DS x _ _ _)  = fromIntegral x
+> gPriceRed _ = 0
 
-> getInStock :: Datensatz -> Nat0
-> getInStock (DS _ x _ _) = x
-> getInStock _ = 0
+> gStock :: Datensatz -> Nat0
+> gStock (DS _ x _ _) = x
+> gStock _ = 0
 
 > isInStock :: Datensatz -> Bool
 > isInStock (DS _ x _ _) = x>0
@@ -124,9 +128,7 @@ getter functions for Datensatz
 
 > minV :: [(a, EUR)] -> Maybe EUR
 > minV [] = Nothing
-
- minV ((_,EUR 0):xs) = minV xs
-
+> minV ((_,EUR 0):xs) = minV xs
 > minV [(_,x)] = Just x
 > minV ((_,x):xs)
 >   | isNothing(minV xs) = Just x 
@@ -150,7 +152,7 @@ Aufgabe A.1
 >   where
 >   checkFor :: Typ -> Lieferanten -> Lieferantenliste -> Lieferantenliste
 >   checkFor typ a (x:xs)
->     | isInStock $ toData a x typ= x : checkFor typ a xs
+>     | gStock (toData a x typ) > 0 = x : checkFor typ a xs
 >     | otherwise = checkFor typ a xs
 >   checkFor _ _ _ = []
 
@@ -165,26 +167,19 @@ Aufgabe A.2
 > type Gesamtpreis = Nat0
 
 > sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Lieferanten -> (Stueckzahl,Gesamtpreis)
-> sofort_erhaeltliche_Stueckzahl typ a = checkFor typ a lfrntn
->   where
+> sofort_erhaeltliche_Stueckzahl typ a = foldl (\(k,l)(m, n)->(k+m,l+n)) (0,0) $ map (\q-> (gStock(toData a q typ),gStock(toData a q typ)*gPrice(toData a q typ))) lfrntn
 
->   checkFor :: Typ -> Lieferanten -> Lieferantenliste -> (Stueckzahl,Gesamtpreis)
->   checkFor typ a (x:xs) = let s = getInStock(toData a x typ)
->                               p = getPrice(toData a x typ)
->                           in add (s, s*p) $ checkFor typ a xs
->   checkFor _ _ _ = (0,0)
 
->   add :: (Stueckzahl,Gesamtpreis) -> (Stueckzahl,Gesamtpreis) -> (Stueckzahl,Gesamtpreis)
->   add (a,c) (b,d) = (a+b,c+d)
-        
 Knapp, aber gut nachvollziebar, geht die Implementierung folgendermaßen vor:
-...
+
+  Lieferantenliste ->  [(Stueckzahl, Stueckzahl * Preis)]
+  sum (Lieferantenliste)
 
 Aufgabe A.3
 
 > type Preis = EUR
 > guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Lieferanten -> Maybe Lieferantenliste
-> guenstigste_Lieferanten typ lff a = maybefy $ map fst $ trim2Min $ getPriceList lfrntn typ lff a
+> guenstigste_Lieferanten typ lff a = maybefy ( map fst ( trim2Min ( getPriceList lfrntn typ lff a)))
 >   where
 
 >   maybefy :: [a] -> Maybe [a]
@@ -194,8 +189,8 @@ Aufgabe A.3
 >   getPriceList :: Lieferantenliste -> Typ -> Lieferfenster -> Lieferanten -> [(Lieferantenname, Preis)]
 >   getPriceList (x:xs) typ lff a = let d = toData a x typ in
 >       if getInStockBy d lff >0
->       then (x, EUR $ getPrice d ) : getPriceList (x:xs) typ lff a
->       else getPriceList (x:xs) typ lff a
+>       then (x, EUR $ gPrice d) : getPriceList xs typ lff a
+>       else getPriceList xs typ lff a
 >   getPriceList _ _ _ _ = []
 >       
 
@@ -215,7 +210,7 @@ Aufgabe A.4
 
 >   stockListRed :: [Lieferantenname] -> Typ -> Lieferfenster -> Lieferanten -> Stueckzahl ->[(Lieferantenname, RabattierterPreis, Stueckzahl)]
 >   stockListRed (x:xs) typ lff a n
->     = let d = toData a x typ in (x, EUR (ceiling  $ getPriceRed d * fromIntegral n), getInStockBy d lff) : stockListRed xs typ lff a n
+>     = let d = toData a x typ in (x, EUR (ceiling  $ gPriceRed d * fromIntegral n), getInStockBy d lff) : stockListRed xs typ lff a n
 >   stockListRed _ _ _ _ _ = []
 > 
 
