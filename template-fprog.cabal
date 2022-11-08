@@ -45,10 +45,12 @@ test-suite fprog-tests
     TestSuite1
     TestSuite2
     TestSuite3
-    TestSuite4
+    --TestSuite4
     TestSuite5
     TestSuite6
     TestSuite7
+    Angabe1_TestSuite
+    Angabe2_TestSuite
 
   ghc-options:      -Wall
   build-depends:
