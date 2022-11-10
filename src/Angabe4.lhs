@@ -116,11 +116,9 @@ getter functions for Datensatz
 >   | otherwise = let val = fromJust (minV x) in filter (\y -> snd y == val) x
 
 > minV :: [(a, EUR)] -> Maybe EUR
-> minV [] = Nothing
-> minV [(_,x)] = Just x
-> minV ((_,x):xs)
->   | isNothing(minV xs) = Just x 
->   | otherwise = min (Just x) (minV xs)
+> minV ((_,x):xs) = Just $ foldl min x (map (\(_,a)->a)xs) 
+> minV _ = Nothing
+
 
 ----------------------------------------------------------------------------------
                                 end utilities
