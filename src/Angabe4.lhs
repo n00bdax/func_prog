@@ -130,20 +130,8 @@ getter functions for Datensatz
 
 Aufgabe A.1
 
-
 > sofort_erhaeltlich_bei :: Suchanfrage -> Lieferanten  -> Lieferantenliste
-> sofort_erhaeltlich_bei typ a = checkFor typ a list
->   where
->   checkFor :: Typ -> Lieferanten -> Lieferantenliste -> Lieferantenliste
->   checkFor typ a (x:xs)
->     | gStock (toData a x typ) > 0 = x : checkFor typ a xs
->     | otherwise = checkFor typ a xs
->   checkFor _ _ _ = []
-
-
-Knapp, aber gut nachvollziebar, geht die Implementierung folgendermaßen vor:
-...
-
+> sofort_erhaeltlich_bei typ a = filter (\x -> gStock(toData a x typ) > 0) list
 
 Aufgabe A.2
 
@@ -151,14 +139,7 @@ Aufgabe A.2
 > type Gesamtpreis = Nat0
 
 > sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Lieferanten -> (Stueckzahl,Gesamtpreis)
-> sofort_erhaeltliche_Stueckzahl typ a = foldl (\(k,l)(m, n)->(k+m,l+n)) (0,0) $
->                                        map (\q-> (gStock(toData a q typ),gStock(toData a q typ)*gPrice(toData a q typ))) list
-
-
-Knapp, aber gut nachvollziebar, geht die Implementierung folgendermaßen vor:
-
-  Lieferantenliste ->  [(Stueckzahl, Stueckzahl * Preis)]
-  sum (Lieferantenliste)
+> sofort_erhaeltliche_Stueckzahl typ a = foldl (\(a,b)(c,d)->(a+c,b+d)) (0,0) $ map (\q-> let d = (toData a q typ) in (gStock d, gStock d * gPrice d)) list
 
 Aufgabe A.3
 
@@ -169,8 +150,8 @@ Aufgabe A.3
 
 >   gStockListBy :: Lieferantenliste -> Typ -> Lieferanten -> Lieferfenster ->  [(Lieferantenname, Preis)]
 >   gStockListBy (x:xs) typ a lff =
->       let d = toData a x typ in
->       if gStockBy d lff >0
+>       let d = toData a x typ in 
+>       if gStockBy d lff > 0
 >       then (x, EUR $ gPrice d) : gStockListBy xs typ a lff
 >       else gStockListBy xs typ a lff
 >   gStockListBy _ _ _ _ = []
