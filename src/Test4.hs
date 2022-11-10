@@ -23,7 +23,7 @@ fenster2 f = case f of
   (LF Q1 2025) -> 2
   _ -> 0
 
-lieferanten :: Lieferantenname -> Sortiment
+lieferanten :: Lieferanten
 lieferanten name = case name of
   L1 -> WMS (\case
       WM_Typ1 -> DS 69 0 fenster1 DreiProzent

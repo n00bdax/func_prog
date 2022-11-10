@@ -61,7 +61,6 @@
 
 > data Lieferantenname = L1 | L2 | L3 | L4 | L5 | L6 | L7 | L8 | L9 | L10
 >   deriving (Eq, Bounded, Enum, Show)
-
 > type Lieferantenliste = [Lieferantenname]
 
 > type Lieferanten = Lieferantenname -> Sortiment
@@ -81,9 +80,14 @@ getter functions for Datensatz
 > gPrice (DS x _ _ _) = x
 > gPrice _ = 0
 
-> gPriceRed :: (Num a, Fractional a) => Datensatz -> a
+> drei :: Double
+> drei = 0.97
+
+
+
+> gPriceRed :: Datensatz -> Double
 > gPriceRed (DS x _ _ DreiProzent)  = fromIntegral x * 0.97
-> gPriceRed (DS x _ _ FuenfProzent) = fromIntegral x * 0.95
+> gPriceRed (DS x _ _ FuenfProzent)  = fromIntegral x * 0.95
 > gPriceRed (DS x _ _ ZehnProzent)  = fromIntegral x * 0.9
 > gPriceRed (DS x _ _ _)  = fromIntegral x
 > gPriceRed _ = 0
@@ -96,9 +100,9 @@ getter functions for Datensatz
 > isInStock (DS _ x _ _) = x>0
 > isInStock _ = False
 
-> getInStockBy :: Datensatz -> (Lieferfenster -> Nat0)
-> getInStockBy (DS _ _ x _) = x
-> getInStockBy _ = const 0
+> gStockBy :: Datensatz -> (Lieferfenster -> Nat0)
+> gStockBy (DS _ _ x _) = x
+> gStockBy _ = const 0
 
 > getSkonto :: Datensatz -> Skonto
 > getSkonto (DS _ _ _ x)  =x
@@ -108,18 +112,12 @@ getter functions for Datensatz
 > toData :: Lieferanten -> Lieferantenname -> Typ -> Datensatz
 > toData a n t = extract (a n) t
 >   where
->   extract (WMS {wm=f}) (WM t) = f t
->   extract (WTS {wt=f}) (WT t) = f t
->   extract (WSS {ws=f}) (WS t) = f t
+>   extract (WMS {wm=wm}) (WM t) = wm t
+>   extract (WTS {wt=wt}) (WT t) = wt t
+>   extract (WSS {ws=ws}) (WS t) = ws t
 >   extract _ _ = DS 0 0 (const 0) Kein_Skonto
 
-> drop2 :: [(a, b)] -> [a]
-> drop2 ((x,_):xs) = x:drop2 xs
-> drop2 _ = []
 
-> drop3 :: [(a, b, c)] -> [(a, b)]
-> drop3 ((x,y,_):xs) = (x,y):drop3 xs
-> drop3 _ = []
 
 > trim2Min :: [(a, EUR)] -> [(a, EUR)]
 > trim2Min x
@@ -167,7 +165,8 @@ Aufgabe A.2
 > type Gesamtpreis = Nat0
 
 > sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Lieferanten -> (Stueckzahl,Gesamtpreis)
-> sofort_erhaeltliche_Stueckzahl typ a = foldl (\(k,l)(m, n)->(k+m,l+n)) (0,0) $ map (\q-> (gStock(toData a q typ),gStock(toData a q typ)*gPrice(toData a q typ))) lfrntn
+> sofort_erhaeltliche_Stueckzahl typ a = foldl (\(k,l)(m, n)->(k+m,l+n)) (0,0) $
+>                                        map (\q-> (gStock(toData a q typ),gStock(toData a q typ)*gPrice(toData a q typ))) lfrntn
 
 
 Knapp, aber gut nachvollziebar, geht die Implementierung folgendermaßen vor:
@@ -179,19 +178,16 @@ Aufgabe A.3
 
 > type Preis = EUR
 > guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Lieferanten -> Maybe Lieferantenliste
-> guenstigste_Lieferanten typ lff a = maybefy ( map fst ( trim2Min ( getPriceList lfrntn typ lff a)))
+> guenstigste_Lieferanten typ lff a = (\x -> if x==[]then Nothing else Just x) ( map (\(x,_)->x) ( trim2Min ( gStockListBy lfrntn typ a lff)))
 >   where
 
->   maybefy :: [a] -> Maybe [a]
->   maybefy [] = Nothing
->   maybefy a  = Just a
-
->   getPriceList :: Lieferantenliste -> Typ -> Lieferfenster -> Lieferanten -> [(Lieferantenname, Preis)]
->   getPriceList (x:xs) typ lff a = let d = toData a x typ in
->       if getInStockBy d lff >0
->       then (x, EUR $ gPrice d) : getPriceList xs typ lff a
->       else getPriceList xs typ lff a
->   getPriceList _ _ _ _ = []
+>   gStockListBy :: Lieferantenliste -> Typ -> Lieferanten -> Lieferfenster ->  [(Lieferantenname, Preis)]
+>   gStockListBy (x:xs) typ a lff =
+>       let d = toData a x typ in
+>       if gStockBy d lff >0
+>       then (x, EUR $ gPrice d) : gStockListBy xs typ a lff
+>       else gStockListBy xs typ a lff
+>   gStockListBy _ _ _ _ = []
 >       
 
 
@@ -204,13 +200,13 @@ Aufgabe A.4
 > type RabattierterPreis = EUR
 
 > guenstigste_Lieferanten_im_Lieferfenster ::  Suchanfrage -> Lieferfenster -> Stueckzahl -> Lieferanten -> [(Lieferantenname,RabattierterPreis)]
-> guenstigste_Lieferanten_im_Lieferfenster typ lff n a =  trim2Min $ drop3 $ filter (\x -> e3 x >= n) $ stockListRed lfrntn typ lff a n
+> guenstigste_Lieferanten_im_Lieferfenster typ lff n a =  trim2Min $ map (\(x,y,_)->(x,y)) $ filter (\x -> e3 x >= n) $ stockListRed lfrntn typ lff a n
 >   where
 
 
 >   stockListRed :: [Lieferantenname] -> Typ -> Lieferfenster -> Lieferanten -> Stueckzahl ->[(Lieferantenname, RabattierterPreis, Stueckzahl)]
 >   stockListRed (x:xs) typ lff a n
->     = let d = toData a x typ in (x, EUR (ceiling  $ gPriceRed d * fromIntegral n), getInStockBy d lff) : stockListRed xs typ lff a n
+>     = let d = toData a x typ in (x, EUR (ceiling $ gPriceRed d * fromIntegral n), gStockBy d lff) : stockListRed xs typ lff a n
 >   stockListRed _ _ _ _ _ = []
 > 
 
