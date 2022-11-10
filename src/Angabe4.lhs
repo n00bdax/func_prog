@@ -71,19 +71,14 @@
                                     utilities
 ----------------------------------------------------------------------------------
 
-> lfrntn :: Lieferantenliste
-> lfrntn = [minBound..maxBound]
+> list :: Lieferantenliste
+> list = [minBound..maxBound]
 
 getter functions for Datensatz
 
 > gPrice :: Datensatz -> Nat1
 > gPrice (DS x _ _ _) = x
 > gPrice _ = 0
-
-> drei :: Double
-> drei = 0.97
-
-
 
 > gPriceRed :: Datensatz -> Double
 > gPriceRed (DS x _ _ DreiProzent)  = fromIntegral x * 0.97
@@ -95,10 +90,6 @@ getter functions for Datensatz
 > gStock :: Datensatz -> Nat0
 > gStock (DS _ x _ _) = x
 > gStock _ = 0
-
-> isInStock :: Datensatz -> Bool
-> isInStock (DS _ x _ _) = x>0
-> isInStock _ = False
 
 > gStockBy :: Datensatz -> (Lieferfenster -> Nat0)
 > gStockBy (DS _ _ x _) = x
@@ -132,11 +123,6 @@ getter functions for Datensatz
 >   | isNothing(minV xs) = Just x 
 >   | otherwise = min (Just x) (minV xs)
 
-> e2 :: (a,b,c) -> b
-> e2    (_,x,_)  = x
-> e3 :: (a,b,c) -> c
-> e3    (_,_,x)  = x
-
 ----------------------------------------------------------------------------------
                                 end utilities
 ----------------------------------------------------------------------------------
@@ -146,7 +132,7 @@ Aufgabe A.1
 
 
 > sofort_erhaeltlich_bei :: Suchanfrage -> Lieferanten  -> Lieferantenliste
-> sofort_erhaeltlich_bei typ a = checkFor typ a lfrntn
+> sofort_erhaeltlich_bei typ a = checkFor typ a list
 >   where
 >   checkFor :: Typ -> Lieferanten -> Lieferantenliste -> Lieferantenliste
 >   checkFor typ a (x:xs)
@@ -166,7 +152,7 @@ Aufgabe A.2
 
 > sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Lieferanten -> (Stueckzahl,Gesamtpreis)
 > sofort_erhaeltliche_Stueckzahl typ a = foldl (\(k,l)(m, n)->(k+m,l+n)) (0,0) $
->                                        map (\q-> (gStock(toData a q typ),gStock(toData a q typ)*gPrice(toData a q typ))) lfrntn
+>                                        map (\q-> (gStock(toData a q typ),gStock(toData a q typ)*gPrice(toData a q typ))) list
 
 
 Knapp, aber gut nachvollziebar, geht die Implementierung folgendermaßen vor:
@@ -178,7 +164,7 @@ Aufgabe A.3
 
 > type Preis = EUR
 > guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Lieferanten -> Maybe Lieferantenliste
-> guenstigste_Lieferanten typ lff a = (\x -> if x==[]then Nothing else Just x) ( map (\(x,_)->x) ( trim2Min ( gStockListBy lfrntn typ a lff)))
+> guenstigste_Lieferanten typ lff a = (\x -> if x==[]then Nothing else Just x) ( map (\(x,_)->x) ( trim2Min ( gStockListBy list typ a lff)))
 >   where
 
 >   gStockListBy :: Lieferantenliste -> Typ -> Lieferanten -> Lieferfenster ->  [(Lieferantenname, Preis)]
@@ -200,7 +186,7 @@ Aufgabe A.4
 > type RabattierterPreis = EUR
 
 > guenstigste_Lieferanten_im_Lieferfenster ::  Suchanfrage -> Lieferfenster -> Stueckzahl -> Lieferanten -> [(Lieferantenname,RabattierterPreis)]
-> guenstigste_Lieferanten_im_Lieferfenster typ lff n a =  trim2Min $ map (\(x,y,_)->(x,y)) $ filter (\x -> e3 x >= n) $ stockListRed lfrntn typ lff a n
+> guenstigste_Lieferanten_im_Lieferfenster typ lff n a =  trim2Min $ map (\(x,y,_) -> (x,y)) $ filter (\(_,_,x) -> x >= n) $ stockListRed list typ lff a n
 >   where
 
 
