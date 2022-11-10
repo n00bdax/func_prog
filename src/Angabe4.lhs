@@ -117,7 +117,6 @@ getter functions for Datensatz
 
 > minV :: [(a, EUR)] -> Maybe EUR
 > minV [] = Nothing
-> minV ((_,EUR 0):xs) = minV xs
 > minV [(_,x)] = Just x
 > minV ((_,x):xs)
 >   | isNothing(minV xs) = Just x 
