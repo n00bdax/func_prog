@@ -90,7 +90,7 @@ getter functions for Datensatz
 > gPriceRed (DS x _ _ _)  = fromIntegral x
 > gPriceRed _ = 0
 
-fromIntegral ist in Haskell notewndig um Int mit Double zu multiplizieren ...
+haskell requires fromIntegral for calculating Integrals wwith Fractionals
 
 > gStock :: Datensatz -> Nat0
 > gStock (DS _ x _ _) = x
