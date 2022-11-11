@@ -1,7 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 
-import Angabe4    hiding (fenster1, fenster2, lieferanten, main, tests)
-import Test.HUnit
+import           Angabe4    hiding (fenster1, fenster2, lieferanten, main,
+                             tests)
+import           Test.HUnit
 
 main :: IO ()
 main = runTestTTAndExit $ test tests
