@@ -210,7 +210,7 @@ type Haendlerliste = [Haendler]
 sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
 sofort_lieferfaehig typ a
    | ist_nwgf a = wgf_fehler a
-   | otherwise = map fst . filter (\(_,x) -> gStock x > 0) $ toData typ a
+   | otherwise = reverse . map fst . filter (\(_,x) -> gStock x > 0) $ toData typ a
 
 
 --        map fst $ filter (hasIt typ . snd) a
@@ -269,7 +269,7 @@ guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Anbieter -> Maybe Hae
 guenstigste_Lieferanten typ lff a
    | ist_nwgf a = wgf_fehler a
    | otherwise  = (\x -> if null x then Nothing else Just x) .
-                  map fst . trim2MinSnd . map (second gPrice) $
+                  reverse . map fst . trim2MinSnd . map (second gPrice) $
                   filter (\x -> gStockBy (snd x) lff> 0)$
                   toData typ a
 
@@ -287,7 +287,7 @@ guenstigste_Lieferanten_im_Lieferfenster ::
    -> [(Haendler,RabattierterPreis)]
 guenstigste_Lieferanten_im_Lieferfenster typ lff n a
    | ist_nwgf a = wgf_fehler a
-   | otherwise  = trim2MinSnd .
+   | otherwise  = reverse . trim2MinSnd .
                   map (\(x,y) -> (x,EUR $ ceiling (gPriceRed y * fromIntegral n))) .
                   filter (\(_,x) -> gStockBy x lff >= n) $
                   toData typ a
