@@ -3,11 +3,11 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE InstanceSigs      #-}
 {-# HLINT ignore "Use infix" #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase        #-}
 module Angabe5 where
+import           Control.Exception
 import           Data.Bifunctor
 import           Data.Maybe
-import Control.Exception
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
    2. Vervollständigen Sie auch die vorgegebenen Kommentaranfänge!
@@ -90,6 +90,9 @@ hasDuplicates :: Eq a => [a] -> Bool
 hasDuplicates (x:xs) = elem x xs || hasDuplicates xs
 hasDuplicates _      = False
 
+-- ceiling10 :: (Num a) => Double -> a
+-- ceiling10 =
+
 -- made them thinking they make sense, never used them
 matchL :: Eq a => a -> [(a,b)] -> Maybe b
 matchL a b
@@ -127,7 +130,7 @@ gStockBy :: Datensatz -> Lieferfenster -> Stueckzahl
 gStockBy (DS _ _ x _) lff
    | ist_nwgf x = wgf_fehler x
    | otherwise = (\case []-> 0
-                        a -> (snd $ head a)) $ filter (\a->fst a == lff) x
+                        a  -> (snd $ head a)) $ filter (\a->fst a == lff) x
 gStockBy _ _              = 0
 
 getSkonto :: Datensatz -> Skonto
@@ -146,7 +149,9 @@ trim2MinSnd trimList
 
 
 toData :: Typ -> Anbieter -> [(Haendler, Datensatz)]
-toData typ = mapMaybe (\(x,y) -> (\(a,b) -> if isNothing b then Nothing else Just (a,fromJust b))( x,(\a-> if null a then Nothing else Just (head a)) . map snd $ filter (\g -> fst g == typ) y ))
+toData typ = mapMaybe((\case  (x,Just y) -> Just (x,y)
+                              _          -> Nothing) . second (lookup typ))
+--toData typ = mapMaybe (\(x,y) -> (\(a,b) -> if isNothing b then Nothing else Just (a,fromJust b))( x,(\a-> if null a then Nothing else Just (head a)) . map snd $ filter (\g -> fst g == typ) y ))
 -- toData can only return a single Datensatz per Typ and Haendler
 -- luckily that's covered by Wgf
 
@@ -154,7 +159,7 @@ di :: Int -> Int -> IO Bool
 di a b = do
   r <- try (return (div a b)) :: IO (Either SomeException Int)
   return $ case r of
-             Left _ -> False
+             Left _  -> False
              Right _ -> True
 
 
@@ -302,7 +307,7 @@ guenstigste_Lieferanten_im_Lieferfenster typ lff n anbieter
    | null anbieter = []
    | ist_nwgf anbieter = wgf_fehler anbieter
    | otherwise  = reverse . trim2MinSnd .
-                  map (\(x,y) -> (x,EUR $ ceiling (gPriceRed y * fromIntegral n))) .
+                  map (\(x,y) -> (x,EUR $ (\a ->  10 * ceiling ( a/10)) (gPriceRed y * fromIntegral n))) .
                   filter (\(_,x) -> gStockBy x lff >= n) $
                   toData typ anbieter
 

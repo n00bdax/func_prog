@@ -18,6 +18,7 @@ library
     , array       >=0.5.2.0
     , base        >=4.10
     , QuickCheck  >=2.14
+    , HUnit
 
   -- These are warnings that are generally useful for this exercise
   ghc-options:
