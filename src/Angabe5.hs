@@ -218,6 +218,7 @@ type Haendlerliste = [Haendler]
 
 sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
 sofort_lieferfaehig typ anbieter
+   | null anbieter = []
    | ist_nwgf anbieter = wgf_fehler anbieter
    | otherwise =  reverse . map fst . filter (\(_,x) -> gStock x > 0) $
                   toData typ anbieter
@@ -246,6 +247,7 @@ type Stueckzahl  = Nat0
 type Gesamtpreis = Nat0
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl,Gesamtpreis)
 sofort_erhaeltliche_Stueckzahl typ anbieter
+   | null anbieter = (0,0)
    | ist_nwgf anbieter = wgf_fehler anbieter
    | otherwise =  foldl (\(a,b)(c,d)->(a+c,b+d))(0,0) .
                   map(\(_,x)-> (gStock x,gPrice x * gStock x)) $
@@ -279,6 +281,7 @@ sofort_erhaeltliche_Stueckzahl typ anbieter
 type Preis = EUR
 guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Anbieter -> Maybe Haendlerliste
 guenstigste_Lieferanten typ lff anbieter
+   | null anbieter = Nothing
    | ist_nwgf anbieter = wgf_fehler anbieter
    | otherwise  = (\x -> if null x then Nothing else Just x) .
                   reverse . map fst . trim2MinSnd . map (second gPrice) .
@@ -296,6 +299,7 @@ type RabattierterPreis = EUR
  -- TODO test if nwgf_error Lieferaussicht works form helper
 guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Anbieter -> [(Haendler,RabattierterPreis)]
 guenstigste_Lieferanten_im_Lieferfenster typ lff n anbieter
+   | null anbieter = []
    | ist_nwgf anbieter = wgf_fehler anbieter
    | otherwise  = reverse . trim2MinSnd .
                   map (\(x,y) -> (x,EUR $ ceiling (gPriceRed y * fromIntegral n))) .
