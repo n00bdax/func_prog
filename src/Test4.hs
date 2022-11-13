@@ -3,7 +3,7 @@
 import           Angabe4    hiding (fenster1, fenster2, lieferanten, main,
                              tests)
 import           Test.HUnit
-
+import Control.Exception
 main :: IO ()
 main = runTestTTAndExit $ test tests
 
@@ -88,3 +88,5 @@ tests =
   , " A.4.5" ~: guenstigste_Lieferanten_im_Lieferfenster (WM WM_Typ4) (LF Q1 2025) 2   lieferanten ~?= [(L2, EUR 179), (L4, EUR 179), (L5, EUR 179)]
   , " A.4.6" ~: guenstigste_Lieferanten_im_Lieferfenster (WM WM_Typ4) (LF Q1 2025) 1   lieferanten ~?= [(L2, EUR 90), (L4, EUR 90), (L5, EUR 90)]
   , " A.4.7" ~: guenstigste_Lieferanten_im_Lieferfenster (WS WS_Typ1) (LF Q2 2023) 4   lieferanten ~?= [(L8, EUR 454)]]
+
+
