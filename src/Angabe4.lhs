@@ -1,4 +1,3 @@
-> {-# LANGUAGE LambdaCase #-}
 > {-# OPTIONS_GHC -Wno-name-shadowing #-}
 > {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 > {-# HLINT ignore "Use camelCase" #-}
@@ -90,7 +89,6 @@ getter functions for Datensatz
 > gPriceRed (DS x _ _ _)  = fromIntegral x
 > gPriceRed _ = 0
 
-haskell requires fromIntegral for calculating Integrals wwith Fractionals
 
 > gStock :: Datensatz -> Nat0
 > gStock (DS _ x _ _) = x
@@ -115,7 +113,7 @@ data extractor function
 
 miscellaneous helper functions
 
-> trim2MinSnd :: [(a, EUR)] -> [(a, EUR)]
+> trim2MinSnd :: Ord b => [(a, b)] -> [(a, b)]
 > trim2MinSnd x
 >   | isNothing(minSnd x) = []
 >   | otherwise = let minVal = fromJust (minSnd x)
@@ -200,8 +198,8 @@ Aufgabe A.3
 
 > type Preis = EUR
 > guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Lieferanten -> Maybe Lieferantenliste
-> guenstigste_Lieferanten typ lff a = (\x -> if null x then Nothing else Just x) $
->                                      map fst $
+> guenstigste_Lieferanten typ lff a = (\x -> if null x then Nothing else Just x) .
+>                                      map fst .
 >                                      trim2MinSnd $
 >                                      gStockListBy list typ a lff
 >   where
@@ -242,12 +240,9 @@ Aufgabe A.4
 
 > guenstigste_Lieferanten_im_Lieferfenster ::  Suchanfrage -> Lieferfenster -> Stueckzahl -> Lieferanten -> [(Lieferantenname,RabattierterPreis)]
 > guenstigste_Lieferanten_im_Lieferfenster typ lff n a = 
->   trim2MinSnd $
->   map    (\(x,y,_) -> (x,y)) $
->   filter (\(_,_,x) -> x >= n) $ 
->   map    (\x -> let d = toData (a x) typ; p = gPriceRed d; s = gStockBy d lff
->                 in (x, EUR (ceiling $ p * fromIntegral n), s))
->   list
+>   trim2MinSnd . map (\(x,y,_) -> (x,y)) . filter (\(_,_,x) -> x >= n) $ 
+>   map (\x -> let d = toData (a x) typ; p = gPriceRed d; s = gStockBy d lff
+>                 in (x, EUR (ceiling $ p * fromIntegral n), s)) list
 
 
 map
