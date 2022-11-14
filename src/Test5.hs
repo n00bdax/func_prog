@@ -33,16 +33,16 @@ assertError errorMsg action = do
 
 
 anb1,anb2,anbf1,anbf2,anbf3 :: Anbieter
-anb1 = A [(H1,sort1),
-        (H2,sort2),
-        (H3,sort3),
-        (H4,sort4),
-        (H5,sort5),
-        (H6,sort6),
-        (H7,sort7),
+anb1 = A [(H9,sort9), -- reversed order
+        (H10,sort10),
         (H8,sort8),
-        (H9,sort9),
-        (H10,sort10)
+        (H7,sort7),
+        (H6,sort6),
+        (H5,sort5),
+        (H4,sort4),
+        (H3,sort3),
+        (H1,sort1),
+        (H2,sort2)
         ]
 anb2 =A[(H1,sort10),
         (H2,sort5),

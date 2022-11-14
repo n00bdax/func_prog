@@ -3,8 +3,9 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use camelCase" #-}
 module Angabe5 where
+import           Data.Bifunctor
+import           Data.List
 import           Data.Maybe
-import Data.Bifunctor
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
    2. Vervollständigen Sie auch die vorgegebenen Kommentaranfänge!
@@ -60,7 +61,7 @@ newtype Anbieter = A [(Haendler,Sortiment)]        deriving (Eq,Show)
 
 
 data Haendler = H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10
-   deriving (Eq, Enum, Bounded, Show)
+   deriving (Eq, Enum, Bounded, Show, Ord)
 
 
 type Suchanfrage = Typ
@@ -94,7 +95,7 @@ gLA _            = LA []
 
 
 gStockBy :: Datensatz -> Lieferfenster -> Stueckzahl
-gStockBy (DS _ _ (LA x) _) lff = (\case []-> 0
+gStockBy (DS _ _ (LA x) _) lff = (\case [] -> 0
                                         a  -> (snd $ head a)) $ filter (\a->fst a == lff) x
 gStockBy _ _              = 0
 
@@ -171,10 +172,8 @@ sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
 sofort_lieferfaehig typ (A anbieter)
    | null anbieter = []
    | ist_nwgf (A anbieter) = wgf_fehler (A anbieter)
-   | otherwise =  reverse . map fst . filter (\(_,x) -> gStock x > 0) $
+   | otherwise =  reverse . sort . map fst . filter (\(_,x) -> gStock x > 0) $
                   toData typ (A anbieter)
-
-
 
 -- Aufgabe A.6
 
@@ -190,8 +189,6 @@ sofort_erhaeltliche_Stueckzahl typ (A anbieter)
                   toData typ (A anbieter)
 
 
-
-
 -- Aufgabe A.7
 
 type Preis = EUR
@@ -200,12 +197,10 @@ guenstigste_Lieferanten typ lff (A anbieter)
    | null anbieter = Nothing
    | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
    | otherwise  = (\x -> if null x then Nothing else Just x) .
-                  reverse . map fst . trim2MinSnd $
-                  map (second gPrice) $ 
+                  reverse . sort . map fst . trim2MinSnd $
+                  map (second gPrice) $
                   filter (\x -> gStockBy (snd x) lff> 0)$
                   toData typ (A anbieter)
-
-
 
 
 -- Aufgabe A.8
@@ -216,7 +211,7 @@ guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stue
 guenstigste_Lieferanten_im_Lieferfenster typ lff n (A anbieter)
    | null anbieter = []
    | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
-   | otherwise  = reverse . trim2MinSnd .
+   | otherwise  = reverse . sort .  trim2MinSnd .
                   map (\(x,y) -> (x,EUR $ (\a ->  10 * ceiling ( a/10)) (gPriceRed y * fromIntegral n))) .
                   filter (\(_,x) -> gStockBy x lff >= n) $
                   toData typ (A anbieter)

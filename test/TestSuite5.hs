@@ -15,6 +15,15 @@ import           Test.Tasty.HUnit
 import           Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
 
 
+
+{-
+
+cabal repl -b base -b tasty -b tasty-hunit
+:l TestSuite5.hs
+main
+
+-}
+
 main :: IO ()
 main =
   defaultMainWithIngredients
@@ -38,18 +47,17 @@ assertError errorMsg action = do
 ---------------------------------------------------------
 
 
-
 anb1,anb2,anbf1,anbf2,anbf3 :: Anbieter
-anb1 = A [(H1,sort1),
-        (H2,sort2),
-        (H3,sort3),
-        (H4,sort4),
-        (H5,sort5),
-        (H6,sort6),
-        (H7,sort7),
+anb1 = A [(H9,sort9), -- reversed order
+        (H10,sort10),
         (H8,sort8),
-        (H9,sort9),
-        (H10,sort10)
+        (H7,sort7),
+        (H6,sort6),
+        (H5,sort5),
+        (H4,sort4),
+        (H3,sort3),
+        (H1,sort1),
+        (H2,sort2)
         ]
 anb2 =A[(H1,sort10),
         (H2,sort5),
@@ -88,6 +96,7 @@ anbf3 =A[(H1,sort1),
         (H8,sort8),
         (H9,sort9),
         (H10,sort10)]
+
 sort1, sort2, sort3, sort4, sort5, sort6, sort7, sort8, sort9, sort10, sortf1, sortf2,sortf3 :: Sortiment
 sort1  = Sort [(M M2,ds1),(M M3,ds1),(M M4,ds1),(M M5,ds1),(T T2,ds1),(T T3,ds1),(T T4,ds1),(S S2,ds1),(S S3,ds0)]
 sort2  = Sort [(M M1,ds2),(M M2,ds2),(M M3,ds2),(M M4,ds2),(M M5,ds2)]
@@ -224,8 +233,6 @@ labf = LA[(LF Q1 2023, 0),
         (LF Q4 2025, 0),
         (LF Q4 2023, 1)--duplicate, differing
         ]
-
-
 ---------------------------------------------------------
 ---------------------------------------------------------
 
