@@ -179,7 +179,7 @@ Aufgabe A.3
 
 > type Preis = EUR
 > guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Lieferanten -> Maybe Lieferantenliste
-> guenstigste_Lieferanten typ lff a = maybefy ( map fst ( trim2Min ( getPriceList lfrntn typ lff a)))
+> guenstigste_Lieferanten typ lff a = maybefy $ map fst $ trim2Min $ getPriceList lfrntn typ lff a
 >   where
 
 >   maybefy :: [a] -> Maybe [a]
