@@ -276,17 +276,19 @@ tests = [
 
         "[ A.5 - f1 ]"~: TestCase $ assertError "Anbieterfehler" (sofort_lieferfaehig (M M1) anbf1),
         "[ A.5 - f2 ]"~: TestCase $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T4) anbf2),
+        "[ A.5 - f3 ]"~: TestCase $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T2) anbf3),
 
         "[ A.6 - f1 ]"~: TestCase $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (S S3) anbf1),
         "[ A.6 - f2 ]"~: TestCase $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (M M2) anbf2),
+        "[ A.6 - f3 ]"~: TestCase $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (M M4) anbf3),
 
         "[ A.7 - f1 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf1),
-        "[ A.7 - f1 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf2),
-        "[ A.7 - f1 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M1) (LF Q1 2023) anbf3),
+        "[ A.7 - f2 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf2),
+        "[ A.7 - f3 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M1) (LF Q1 2023) anbf3),
 
         "[ A.8 - f1 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf1),
-        "[ A.8 - f1 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf2),
-        "[ A.8 - f2 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 1 anbf3),
+        "[ A.8 - f2 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf2),
+        "[ A.8 - f3 ]"~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 1 anbf3),
 
         "True == True" ~: True~?=True ]
 

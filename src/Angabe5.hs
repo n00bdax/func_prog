@@ -68,7 +68,9 @@ type Suchanfrage = Typ
 ----------------- helper functions ----------------
 
 toData :: Typ -> Anbieter -> [(Haendler, Datensatz)]
-toData typ (A a)= mapMaybe (\(x,Sort y) -> (\(v,w) -> if isNothing w then Nothing else Just (v,fromJust w))( x,(\v-> if null v then Nothing else Just (head v)) . map snd $ filter (\g -> fst g == typ) y )) a
+toData typ (A anbieter)= mapMaybe (\(x,Sort y) -> (\(v,w) -> if isNothing w then Nothing else Just (v,fromJust w))
+                         ( x,(\v->  if null v then Nothing else Just (head v)) . map snd $ filter (\g -> fst g == typ) y )
+                         ) anbieter
 
 
 gPrice :: Datensatz -> Nat1
@@ -109,19 +111,6 @@ hasDuplicates :: Eq a => [a] -> Bool
 hasDuplicates (x:xs) = elem x xs || hasDuplicates xs
 hasDuplicates _      = False
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Wgf a where                -- Wgf fuer `wohlgeformt'
  ist_wgf    :: a -> Bool         -- ist_wgf fuer `ist wohlgeformt'
  ist_nwgf   :: a -> Bool         -- ist_nwgf fuer `ist nicht wohlgeformt'
@@ -129,7 +118,7 @@ class Wgf a where                -- Wgf fuer `wohlgeformt'
  -- Protoimplementierungen
  ist_wgf x  = not (ist_nwgf x)
  ist_nwgf x = not (ist_wgf x)
- wgf_fehler = \x -> error "Argument fehlerhaft"
+ wgf_fehler = error "Argument fehlerhaft"
 
 
 -- Aufgabe A.1

@@ -284,17 +284,19 @@ spec = testGroup
 
         testCase "[ A.5 - f1 ]"  $ assertError "Anbieterfehler" (sofort_lieferfaehig (M M1) anbf1),
         testCase "[ A.5 - f2 ]"  $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T4) anbf2),
+        testCase "[ A.5 - f3 ]"  $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T2) anbf3),
 
         testCase "[ A.6 - f1 ]"  $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (S S3) anbf1),
         testCase "[ A.6 - f2 ]"  $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (M M2) anbf2),
+        testCase "[ A.6 - f3 ]"  $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (M M4) anbf3),
 
         testCase "[ A.7 - f1 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf1),
         testCase "[ A.7 - f2 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf2),
         testCase "[ A.7 - f3 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M1) (LF Q1 2023) anbf3),
 
         testCase "[ A.8 - f1 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf1),
-        testCase "[ A.8 - f1 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf2),
-        testCase "[ A.8 - f2 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 1 anbf3),
+        testCase "[ A.8 - f2 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf2),
+        testCase "[ A.8 - f3 ]"  $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 1 anbf3),
 
         testCase "True == True" $ True @?=True ]
 
