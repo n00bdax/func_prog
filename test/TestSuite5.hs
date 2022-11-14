@@ -214,7 +214,6 @@ labf = [(LF Q1 2023, 0),
         (LF Q2 2023, 0),
         (LF Q3 2023, 0),
         (LF Q4 2023, 0),
-        (LF Q4 2023, 1),--duplicate, differing
         (LF Q1 2024, 0),
         (LF Q2 2024, 0),
         (LF Q3 2024, 0),
@@ -222,7 +221,8 @@ labf = [(LF Q1 2023, 0),
         (LF Q1 2025, 0),
         (LF Q2 2025, 0),
         (LF Q3 2025, 0),
-        (LF Q4 2025, 0)
+        (LF Q4 2025, 0),
+        (LF Q4 2023, 1)--duplicate, differing
         ]
 
 
@@ -288,15 +288,15 @@ spec = testGroup
         testCase "[ A.6 - f1 ]"  $ assertError "Anbieterfehler" (sofort_erhaeltliche_Stueckzahl (S S3) anbf1),
         testCase "[ A.6 - f2 ]"  $ assertError "Anbieterfehler" (sofort_erhaeltliche_Stueckzahl (M M2) anbf2),
 
-        testCase "[ A.7 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2013) anbf1),
-        testCase "[ A.7 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2013) anbf2),
-        testCase "[ A.7 - f1 ]"  $ assertError "Ausblickfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2013) anbf3),
-        testCase "[ A.7 - f2, not accessed, throwing this error means your code could be lazier]" $ guenstigste_Lieferanten (M M1) (LF Q1 2013) anbf3  @?= Nothing,
+        testCase "[ A.7 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf1),
+        testCase "[ A.7 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf2),
+        testCase "[ A.7 - f1 ]"  $ assertError "Ausblickfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf3),
+        testCase "[ A.7 - f2, not accessed, throwing this error means your code could be lazier]" $ guenstigste_Lieferanten (M M1) (LF Q1 2023) anbf3  @?= Just [H5,H2],
 
-        testCase "[ A.8 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2013) 0 anbf1),
-        testCase "[ A.8 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2013) 0 anbf2),
-        testCase "[ A.8 - f2 ]"  $ assertError "Ausblickfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2013) 1 anbf3),
-        testCase "[ A.8 - f3, not accessed, throwing this error means your code could be lazier]" $ guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2013) 0 anbf3  @?= [(H5,EUR {euro = 0}),(H2,EUR {euro = 0})],
+        testCase "[ A.8 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf1),
+        testCase "[ A.8 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf2),
+        testCase "[ A.8 - f2 ]"  $ assertError "Ausblickfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 1 anbf3),
+        testCase "[ A.8 - f3, not accessed, throwing this error means your code could be lazier]" $ guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 0 anbf3  @?= [(H5,EUR {euro = 0}),(H2,EUR {euro = 0})],
 
         testCase "True == True" $ True @?=True ]
 
