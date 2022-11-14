@@ -283,10 +283,10 @@ spec = testGroup
         testCase "[ A.8 - 7 ]" $ guenstigste_Lieferanten_im_Lieferfenster (S S1) (LF Q1 2050) 7 anb1 @?= [],
 
         testCase "[ A.5 - f1 ]"  $ assertError "Anbieterfehler" (sofort_lieferfaehig (M M1) anbf1),
-        testCase "[ A.5 - f2 ]"  $ assertError"Anbieterfehler" (sofort_erhaeltliche_Stueckzahl (M M1) anbf2),
+        testCase "[ A.5 - f2 ]"  $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T4) anbf2),
 
         testCase "[ A.6 - f1 ]"  $ assertError "Anbieterfehler" (sofort_erhaeltliche_Stueckzahl (S S3) anbf1),
-        testCase "[ A.6 - f2 ]"  $ assertError "Anbieterfehler" (sofort_erhaeltliche_Stueckzahl (M M1) anbf2),
+        testCase "[ A.6 - f2 ]"  $ assertError "Anbieterfehler" (sofort_erhaeltliche_Stueckzahl (M M2) anbf2),
 
         testCase "[ A.7 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2013) anbf1),
         testCase "[ A.7 - f1 ]"  $ assertError "Anbieterfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2013) anbf2),
@@ -298,5 +298,5 @@ spec = testGroup
         testCase "[ A.8 - f2 ]"  $ assertError "Ausblickfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2013) 1 anbf3),
         testCase "[ A.8 - f3, not accessed, throwing this error means your code could be lazier]" $ guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2013) 0 anbf3  @?= [(H5,EUR {euro = 0}),(H2,EUR {euro = 0})],
 
-        testCase "dummy" $ True @?=True ]
+        testCase "True == True" $ True @?=True ]
 
