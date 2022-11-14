@@ -18,6 +18,9 @@ library
     , array       >=0.5.2.0
     , base        >=4.10
     , QuickCheck  >=2.14
+    , HUnit
+    , tasty             >=1.4.2
+    , tasty-hunit
 
   -- These are warnings that are generally useful for this exercise
   ghc-options:
@@ -52,6 +55,7 @@ test-suite fprog-tests
     Angabe1_TestSuite
     Angabe2_TestSuite
     Angabe3_TestSuite
+--    Test5
 
   ghc-options:      -Wall
   build-depends:
