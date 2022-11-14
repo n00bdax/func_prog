@@ -1,13 +1,9 @@
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use camelCase" #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE InstanceSigs      #-}
-{-# HLINT ignore "Use infix" #-}
-{-# LANGUAGE LambdaCase        #-}
 module Angabe5 where
-import           Control.Exception
-import           Data.Bifunctor
-import           Data.Maybe
+import Data.Maybe
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
    2. Vervollständigen Sie auch die vorgegebenen Kommentaranfänge!
@@ -21,94 +17,48 @@ type Nat1    = Int     -- Natürliche Zahlen beginnend mit 1
 type Nat2023 = Int     -- Natürliche Zahlen beginnend mit 2023
 
 newtype EUR  = EUR { euro :: Nat1 }
-   deriving (Eq,Ord,Show)
 
 data Skonto  = Kein_Skonto
-               | DreiProzent
+               | DreiProzent  
                | FuenfProzent
                | ZehnProzent
-               deriving (Eq, Ord, Show, Enum, Bounded)
 
 data Waschmaschine    = M1 | M2 | M3 | M4 | M5
-   deriving (Eq, Enum, Bounded, Show)
 data Waeschetrockner  = T1 | T2 | T3 | T4
-   deriving (Eq, Enum, Bounded, Show)
 data Waescheschleuder = S1 | S2 | S3
-   deriving (Eq, Enum, Bounded, Show)
 
 data Typ = M Waschmaschine
            | T Waeschetrockner
            | S Waescheschleuder
-           deriving (Eq, Show)
 
 data Quartal       = Q1 | Q2 | Q3 | Q4 deriving (Eq,Ord,Show)
 type Jahr          = Nat2023
 data Lieferfenster = LF { quartal :: Quartal,
                           jahr    :: Jahr
-                        } deriving (Eq, Ord, Show)
+                        }
 
-type Lieferausblick = [(Lieferfenster,Nat0)]
 
 data Datensatz
-   = DS { preis_in_euro                        :: Nat1,
-          sofort_lieferbare_stueckzahl         :: Nat0,
+   = DS { preis_in_euro :: Nat1,
+          sofort_lieferbare_stueckzahl :: Nat0,
           lieferbare_stueckzahl_im_Zeitfenster :: Lieferausblick,
-          skonto                               :: Skonto
+          skonto :: Skonto
         }
      | Nicht_im_Sortiment
-     deriving (Eq,Show)
+
+newtype Sortiment = Sort [(Typ,Datensatz)]
+newtype Lieferausblick = LA [(Lieferfenster,Nat0)]
+newtype Anbieter = A [(Haendler,Sortiment)]
 
 data Haendler = H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10
-   deriving (Eq, Enum, Bounded, Show)
-
-type Anbieter = [(Haendler,Sortiment)]
-
-type Sortiment = [(Typ,Datensatz)]
-
-type Suchanfrage = Typ
-
-class Wgf a where                  -- Wgf fuer `wohlgeformt'
-   ist_wgf    :: a -> Bool         -- ist_wgf fuer `ist wohlgeformt'
-   ist_nwgf   :: a -> Bool         -- ist_nwgf fuer `ist nicht wohlgeformt'
-   wgf_fehler :: a -> b
-   -- Protoimplementierungen
-   ist_wgf x  = not (ist_nwgf x)
-   ist_nwgf x = not (ist_wgf x)
-   wgf_fehler = error "Argument fehlerhaft"
 
 
+type Suchanfrage = Typ  
 
+----------------- helper functions ----------------
 
-
-
-
-
--- global helper function
-
-
-hasDuplicates :: Eq a => [a] -> Bool
-hasDuplicates (x:xs) = elem x xs || hasDuplicates xs
-hasDuplicates _      = False
-
--- ceiling10 :: (Num a) => Double -> a
--- ceiling10 =
-
--- made them thinking they make sense, never used them
-matchL :: Eq a => a -> [(a,b)] -> Maybe b
-matchL a b
-   | length bs > 1 = error "uncaught error, fix me above matchL"
-   | null bs = Nothing
-   | otherwise = Just $ snd $ head bs
-   where
-      bs = filter (\x -> a == fst x) b
-
-matchR :: Eq a => a -> [(b,a)] -> Maybe b
-matchR a b
-   | length bs > 1 = error "uncaught error, fix me above matchR"
-   | null bs = Nothing
-   | otherwise = Just $ fst $ head bs
-   where
-      bs = filter (\x -> a == snd x) b
+toData :: Typ -> Anbieter -> [(Haendler, Datensatz)]
+toData typ (A a)= mapMaybe (\(x,Sort y) -> (\(v,w) -> if isNothing w then Nothing else Just (v,fromJust w))( x,(\v-> if null a then Nothing else Just (head v)) . map snd $ filter (\g -> fst g == typ) y )) a
 
 
 gPrice :: Datensatz -> Nat1
@@ -147,55 +97,38 @@ trim2MinSnd trimList
   minSnd ((_,x):xs) = Just $ foldl min x (map snd xs)
   minSnd _          = Nothing
 
+hasDuplicates :: Eq a => [a] -> Bool
+hasDuplicates (x:xs) = elem x xs || hasDuplicates xs
+hasDuplicates _      = False
 
-toData :: Typ -> Anbieter -> [(Haendler, Datensatz)]
-toData typ = mapMaybe((\case  (x,Just y) -> Just (x,y)
-                              _          -> Nothing) . second (lookup typ))
---toData typ = mapMaybe (\(x,y) -> (\(a,b) -> if isNothing b then Nothing else Just (a,fromJust b))( x,(\a-> if null a then Nothing else Just (head a)) . map snd $ filter (\g -> fst g == typ) y ))
--- toData can only return a single Datensatz per Typ and Haendler
--- luckily that's covered by Wgf
 
-di :: Int -> Int -> IO Bool
-di a b = do
-  r <- try (return (div a b)) :: IO (Either SomeException Int)
-  return $ case r of
-             Left _  -> False
-             Right _ -> True
 
+
+
+
+
+
+
+
+
+
+
+
+class Wgf a where                -- Wgf fuer `wohlgeformt'
+ ist_wgf    :: a -> Bool         -- ist_wgf fuer `ist wohlgeformt'
+ ist_nwgf   :: a -> Bool         -- ist_nwgf fuer `ist nicht wohlgeformt'
+ wgf_fehler :: a -> b
+ -- Protoimplementierungen
+ ist_wgf x  = not (ist_nwgf x)
+ ist_nwgf x = not (ist_wgf x)
+ wgf_fehler = \x -> error "Argument fehlerhaft"
 
 
 -- Aufgabe A.1
 
-instance Wgf  [(Typ, Datensatz)] where
-
-   ist_wgf :: [(Typ, Datensatz)] -> Bool
-   ist_wgf x  = not (ist_nwgf x)
-
-   ist_nwgf :: [(Typ, Datensatz)] -> Bool
-   ist_nwgf x = hasDuplicates $ map fst x
-
-   wgf_fehler :: [(Typ, Datensatz)] -> b
-   wgf_fehler = error "Sortimentfehler"
-
-
-
-
-instance Wgf  [(Haendler, Sortiment)] where
-
-   ist_wgf :: [(Haendler, Sortiment)] -> Bool
-   ist_wgf x  = not (ist_nwgf x)
-
-   ist_nwgf :: [(Haendler, Sortiment)] -> Bool
-   ist_nwgf x = hasDuplicates (map fst x) ||  any (ist_nwgf . snd) x
-
-   wgf_fehler :: [(Haendler, Sortiment)] -> b
-   wgf_fehler = error "Anbieterfehler"
-
-
-instance Wgf  [(Lieferfenster, Nat0)] where
-
-   ist_wgf :: [(Lieferfenster, Nat0)] -> Bool
-   ist_wgf (x:xs) = subCheck x xs && ist_wgf xs
+instance Wgf Lieferausblick where
+   ist_wgf :: Lieferausblick -> Bool
+   ist_wgf (LA (x:xs)) = subCheck x xs && ist_wgf xs
       where
          subCheck :: (Lieferfenster, Nat0) -> [(Lieferfenster, Nat0)] -> Bool
          subCheck (x1,x2) ((y1,y2):ys)
@@ -204,11 +137,27 @@ instance Wgf  [(Lieferfenster, Nat0)] where
          subCheck _ _ = True
    ist_wgf _ = True
 
-   ist_nwgf :: [(Lieferfenster, Nat0)] -> Bool
-   ist_nwgf x = not (ist_wgf x)
+   ist_nwgf :: Lieferausblick -> Bool
+   ist_nwgf = not . ist_wgf
 
-   wgf_fehler :: [(Lieferfenster, Nat0)] -> b
+   wgf_fehler :: Lieferausblick -> b
    wgf_fehler = error "Ausblickfehler"
+
+instance Wgf Sortiment where
+ ist_wgf = error "Noch nicht implementiert!"
+
+instance Wgf Anbieter where
+   ist_wgf :: Anbieter -> Bool
+   ist_wgf  = not . ist_nwgf
+
+   ist_nwgf :: Anbieter -> Bool
+   ist_nwgf (A x) = hasDuplicates (map fst x) ||  any (ist_nwgf . snd) x
+
+   wgf_fehler :: Anbieter -> b
+   wgf_fehler = error "Anbieterfehler"
+
+
+
 
 
 
@@ -222,26 +171,9 @@ instance Wgf  [(Lieferfenster, Nat0)] where
 type Haendlerliste = [Haendler]
 
 sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
-sofort_lieferfaehig typ anbieter
-   | null anbieter = []
-   | ist_nwgf anbieter = wgf_fehler anbieter
-   | otherwise =  reverse . map fst . filter (\(_,x) -> gStock x > 0) $
-                  toData typ anbieter
+sofort_lieferfaehig = error "Noch nicht implementiert!"
 
-
---        map fst $ filter (hasIt typ . snd) a
---    where
-
---       hasIt :: Typ -> Sortiment -> Bool
---       hasIt typ ((t,d):xs)
---          | t == typ = gStock d > 0
---          | otherwise = hasIt typ xs
---       hasIt _ _ = False
-
--- addTuple :: (Num a, Num b) => (a, b) -> (a, b) -> (a, b)
--- addTuple (a,b) (c,d) = (a+c,b+d)
-
-{- Knapp, aber gut nachvollziehbar geht die Implementierung olgendermassen vor:
+{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
    ...
 -}
 
@@ -250,50 +182,22 @@ sofort_lieferfaehig typ anbieter
 
 type Stueckzahl  = Nat0
 type Gesamtpreis = Nat0
+ 
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl,Gesamtpreis)
-sofort_erhaeltliche_Stueckzahl typ anbieter
-   | null anbieter = (0,0)
-   | ist_nwgf anbieter = wgf_fehler anbieter
-   | otherwise =  foldl (\(a,b)(c,d)->(a+c,b+d))(0,0) .
-                  map(\(_,x)-> (gStock x,gPrice x * gStock x)) $
-                  toData typ anbieter
+sofort_erhaeltliche_Stueckzahl _ a _ = error "Noch nicht implementiert!"
 
-
-
--- sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl,Gesamtpreis)
--- sofort_erhaeltliche_Stueckzahl typ a
---    | ist_nwgf a = wgf_fehler a
---    | otherwise = buildPriceList typ a
---    where
---       buildPriceList :: Suchanfrage -> Anbieter -> (Stueckzahl,Gesamtpreis)
---       buildPriceList typ ((_,x):xs) = addTuple (findPriceList typ x) (buildPriceList typ xs)
---       buildPriceList _ _ = (0, 0)
-
---       findPriceList :: Typ -> Sortiment -> (Stueckzahl,Gesamtpreis)
---       findPriceList typ ((t,d):xs)
---          | t == typ = (gStock d, gStock d * gPrice d)
---          | otherwise = findPriceList typ xs
---       findPriceList _ _ = (0,0)
-
-
-{- Knapp, aber gut nachvollziehbar geht die Implementierung olgendermassen vor:
+{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
    ...
 -}
 
 
 -- Aufgabe A.7
- -- TODO test if nwgf_error Lieferaussicht works form helper
+
 type Preis = EUR
 guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Anbieter -> Maybe Haendlerliste
-guenstigste_Lieferanten typ lff anbieter
-   | null anbieter = Nothing
-   | ist_nwgf anbieter = wgf_fehler anbieter
-   | otherwise  = (\x -> if null x then Nothing else Just x) .
-                  reverse . map fst . trim2MinSnd . map (second gPrice) .
-                  filter (\x -> gStockBy (snd x) lff> 0)$
-                  toData typ anbieter
+guenstigste_Lieferanten = error "Noch nicht implementiert!"
 
-{- Knapp, aber gut nachvollziehbar geht die Implementierung olgendermassen vor:
+{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
    ...
 -}
 
@@ -301,19 +205,11 @@ guenstigste_Lieferanten typ lff anbieter
 -- Aufgabe A.8
 
 type RabattierterPreis = EUR
- -- TODO test if nwgf_error Lieferaussicht works form helper
+
 guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Anbieter -> [(Haendler,RabattierterPreis)]
-guenstigste_Lieferanten_im_Lieferfenster typ lff n anbieter
-   | null anbieter = []
-   | ist_nwgf anbieter = wgf_fehler anbieter
-   | otherwise  = reverse . trim2MinSnd .
-                  map (\(x,y) -> (x,EUR $ (\a ->  10 * ceiling ( a/10)) (gPriceRed y * fromIntegral n))) .
-                  filter (\(_,x) -> gStockBy x lff >= n) $
-                  toData typ anbieter
+guenstigste_Lieferanten_im_Lieferfenster = error "Noch nicht implementiert!"
 
-
-{- Knapp, aber gut nachvollziehbar geht die Implementierung olgendermassen vor:
+{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
    ...
 -}
-
 
