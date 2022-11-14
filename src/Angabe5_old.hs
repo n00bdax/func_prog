@@ -4,7 +4,7 @@
 {-# LANGUAGE InstanceSigs      #-}
 {-# HLINT ignore "Use infix" #-}
 {-# LANGUAGE LambdaCase        #-}
-module Angabe5 where
+-- module Angabe5 where
 import           Control.Exception
 import           Data.Bifunctor
 import           Data.Maybe
@@ -47,7 +47,6 @@ data Lieferfenster = LF { quartal :: Quartal,
                           jahr    :: Jahr
                         } deriving (Eq, Ord, Show)
 
-type Lieferausblick = [(Lieferfenster,Nat0)]
 
 data Datensatz
    = DS { preis_in_euro                        :: Nat1,
@@ -61,9 +60,10 @@ data Datensatz
 data Haendler = H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10
    deriving (Eq, Enum, Bounded, Show)
 
+type Lieferausblick = [(Lieferfenster,Nat0)]
 type Anbieter = [(Haendler,Sortiment)]
-
 type Sortiment = [(Typ,Datensatz)]
+
 
 type Suchanfrage = Typ
 
