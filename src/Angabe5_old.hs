@@ -4,10 +4,11 @@
 {-# LANGUAGE InstanceSigs      #-}
 {-# HLINT ignore "Use infix" #-}
 {-# LANGUAGE LambdaCase        #-}
--- module Angabe5 where
+module Angabe5_old where
 import           Control.Exception
 import           Data.Bifunctor
 import           Data.Maybe
+import Data.List
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
    2. Vervollständigen Sie auch die vorgegebenen Kommentaranfänge!
@@ -58,7 +59,7 @@ data Datensatz
      deriving (Eq,Show)
 
 data Haendler = H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10
-   deriving (Eq, Enum, Bounded, Show)
+   deriving (Eq, Enum, Bounded, Show, Ord)
 
 type Lieferausblick = [(Lieferfenster,Nat0)]
 type Anbieter = [(Haendler,Sortiment)]
@@ -225,7 +226,7 @@ sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
 sofort_lieferfaehig typ anbieter
    | null anbieter = []
    | ist_nwgf anbieter = wgf_fehler anbieter
-   | otherwise =  reverse . map fst . filter (\(_,x) -> gStock x > 0) $
+   | otherwise =  reverse . sort . map fst . filter (\(_,x) -> gStock x > 0) $
                   toData typ anbieter
 
 
@@ -289,7 +290,7 @@ guenstigste_Lieferanten typ lff anbieter
    | null anbieter = Nothing
    | ist_nwgf anbieter = wgf_fehler anbieter
    | otherwise  = (\x -> if null x then Nothing else Just x) .
-                  reverse . map fst . trim2MinSnd . map (second gPrice) .
+                  reverse . sort . map fst . trim2MinSnd . map (second gPrice) .
                   filter (\x -> gStockBy (snd x) lff> 0)$
                   toData typ anbieter
 
@@ -306,7 +307,7 @@ guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stue
 guenstigste_Lieferanten_im_Lieferfenster typ lff n anbieter
    | null anbieter = []
    | ist_nwgf anbieter = wgf_fehler anbieter
-   | otherwise  = reverse . trim2MinSnd .
+   | otherwise  = reverse . sort . trim2MinSnd .
                   map (\(x,y) -> (x,EUR $ (\a ->  10 * ceiling ( a/10)) (gPriceRed y * fromIntegral n))) .
                   filter (\(_,x) -> gStockBy x lff >= n) $
                   toData typ anbieter
