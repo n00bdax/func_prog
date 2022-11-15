@@ -54,7 +54,14 @@ data Lieferfenster = LF
   { quartal :: Quartal,
     jahr :: Jahr
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Show)
+
+instance Ord Lieferfenster where
+  compare :: Lieferfenster -> Lieferfenster -> Ordering
+  compare (LF a1 a2) (LF b1 b2)
+    | x == EQ = compare a1 b1
+    | otherwise = x
+    where x = compare a2 b2
 
 data Datensatz
   = DS
@@ -66,11 +73,14 @@ data Datensatz
   | Nicht_im_Sortiment
   deriving (Eq, Show, Ord)
 
-newtype Lieferausblick = LA [(Lieferfenster, Nat0)] deriving (Eq, Show, Ord)
+newtype Lieferausblick = LA [(Lieferfenster, Nat0)]
+  deriving (Eq, Show, Ord)
 
-newtype Sortiment = Sort [(Typ, Datensatz)] deriving (Eq, Show, Ord)
+newtype Sortiment = Sort [(Typ, Datensatz)]
+  deriving (Eq, Show, Ord)
 
-newtype Anbieter = A [(Haendler, Sortiment)] deriving (Eq, Show, Ord)
+newtype Anbieter = A [(Haendler, Sortiment)]
+  deriving (Eq, Show, Ord)
 
 data Haendler = H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10
   deriving (Eq, Enum, Bounded, Show, Ord)
@@ -154,8 +164,8 @@ class Wgf a where -- Wgf fuer `wohlgeformt'
   wgf_fehler :: a -> b
 
   -- Protoimplementierungen
-  ist_wgf x = not (ist_nwgf x)
-  ist_nwgf x = not (ist_wgf x)
+  ist_wgf = not . ist_nwgf
+  ist_nwgf = not . ist_wgf
   wgf_fehler = error "Argument fehlerhaft"
 
 -- Aufgabe A.1
@@ -171,16 +181,10 @@ instance Wgf Lieferausblick where
       subCheck _ _ = True
   ist_wgf _ = True
 
-  ist_nwgf :: Lieferausblick -> Bool
-  ist_nwgf = not . ist_wgf
-
   wgf_fehler :: Lieferausblick -> b
   wgf_fehler = error "Ausblickfehler"
 
 instance Wgf Sortiment where
-  ist_wgf :: Sortiment -> Bool
-  ist_wgf = not . ist_nwgf
-
   ist_nwgf :: Sortiment -> Bool
   ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (any (ist_nwgf . gLA)) x
 
@@ -188,9 +192,6 @@ instance Wgf Sortiment where
   wgf_fehler = error "Sortimentfehler"
 
 instance Wgf Anbieter where
-  ist_wgf :: Anbieter -> Bool
-  ist_wgf = not . ist_nwgf
-
   ist_nwgf :: Anbieter -> Bool
   ist_nwgf (A x) = hasDuplicates (map fst x) || any (ist_nwgf . snd) x
 
