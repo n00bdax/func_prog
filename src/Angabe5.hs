@@ -61,7 +61,8 @@ instance Ord Lieferfenster where
   compare (LF a1 a2) (LF b1 b2)
     | x == EQ = compare a1 b1
     | otherwise = x
-    where x = compare a2 b2
+    where
+      x = compare a2 b2
 
 data Datensatz
   = DS
@@ -186,7 +187,7 @@ instance Wgf Lieferausblick where
 
 instance Wgf Sortiment where
   ist_nwgf :: Sortiment -> Bool
-  ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (ist_nwgf . gLA.snd) x
+  ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (ist_nwgf . gLA . snd) x
 
   wgf_fehler :: Sortiment -> b
   wgf_fehler = error "Sortimentfehler"
