@@ -186,7 +186,7 @@ instance Wgf Lieferausblick where
 
 instance Wgf Sortiment where
   ist_nwgf :: Sortiment -> Bool
-  ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (any (ist_nwgf . gLA)) x
+  ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (ist_nwgf . gLA.snd) x
 
   wgf_fehler :: Sortiment -> b
   wgf_fehler = error "Sortimentfehler"
