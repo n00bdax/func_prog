@@ -8,6 +8,7 @@ module Angabe5 where
 import Data.Bifunctor
 import Data.List (sort)
 import Data.Maybe
+import GHC.Stack (HasCallStack)
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
    2. Vervollständigen Sie auch die vorgegebenen Kommentaranfänge!
@@ -199,6 +200,12 @@ instance Wgf Anbieter where
   wgf_fehler :: Anbieter -> b
   wgf_fehler = error "Anbieterfehler"
 
+instance Wgf Bool where
+  ist_wgf :: Bool -> Bool
+  ist_wgf = const True
+  wgf_fehler :: Bool -> b
+  wgf_fehler = error "Anbieterargumentfehler"
+
 -- Aufgabe A.5
 
 type Haendlerliste = [Haendler]
@@ -220,7 +227,7 @@ type Gesamtpreis = Nat0
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
 sofort_erhaeltliche_Stueckzahl typ (A anbieter)
   | null anbieter = (0, 0)
-  | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
+  | ist_nwgf (A anbieter) = wgf_fehler True
   | otherwise =
       foldl (\(a, b) (c, d) -> (a + c, b + d)) (0, 0)
         . map (\(_, x) -> (gStock x, gPrice x * gStock x))
@@ -233,7 +240,7 @@ type Preis = EUR
 guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Anbieter -> Maybe Haendlerliste
 guenstigste_Lieferanten typ lff (A anbieter)
   | null anbieter = Nothing
-  | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
+  | ist_nwgf (A anbieter) = wgf_fehler True
   | otherwise =
       (\x -> if null x then Nothing else Just x)
         . reverse
@@ -251,7 +258,7 @@ type RabattierterPreis = EUR
 guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Anbieter -> [(Haendler, RabattierterPreis)]
 guenstigste_Lieferanten_im_Lieferfenster typ lff n (A anbieter)
   | null anbieter = []
-  | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
+  | ist_nwgf (A anbieter) = wgf_fehler True
   | otherwise =
       reverse
         . sort
