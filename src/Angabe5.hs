@@ -98,7 +98,7 @@ toData typ =
     ( \(x, Sort y) ->
         ( \case
             (_, Nothing) -> Nothing
-            (v, w) -> Just (v, fromJust w)
+            (v, Just w) -> Just (v, w)
         )
           ( x,
             ( \case
@@ -106,7 +106,8 @@ toData typ =
                 v -> Just (head v)
             )
               . map snd
-              $ filter (\g -> fst g == typ) y
+              . filter (\g -> fst g == typ)
+              $ y
           )
     )
 
@@ -145,7 +146,8 @@ gStockBy (DS _ _ (LA x) _) lff =
       (a : _) -> (snd a)
       _ -> 0
   )
-    $ filter (\a -> fst a == lff) x
+    . filter (\a -> fst a == lff)
+    $ x
 gStockBy _ _ = 0
 
 getSkonto :: Datensatz -> Skonto
@@ -258,9 +260,10 @@ guenstigste_Lieferanten_im_Lieferfenster typ lff n (A anbieter)
   | null anbieter = []
   | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
   | otherwise =
-      sortBy (comparing (Down . fst))
+      sortBy
+        (comparing $ Down . fst)
         . trim2MinSnd
         . map (\(x, y) -> (x, EUR $ (\a -> 10 * ceiling (a / 10)) (gPriceRed y * fromIntegral n)))
-        . filter (\(_, x) -> gStockBy x lff >= n)
+        . filter (\x -> gStockBy (snd x) lff >= n)
         . toData typ
         $ anbieter
