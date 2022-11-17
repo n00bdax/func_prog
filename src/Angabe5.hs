@@ -93,23 +93,27 @@ type Suchanfrage = Typ
 ----------------- helper functions ----------------
 
 toData :: Typ -> [(Haendler, Sortiment)] -> [(Haendler, Datensatz)]
-toData typ =
-  mapMaybe
-    ( \(x, Sort y) ->
-        ( \case
-            (_, Nothing) -> Nothing
-            (v, Just w) -> Just (v, w)
-        )
-          ( x,
-            ( \case
-                [] -> Nothing
-                v -> Just (head v)
-            )
-              . map snd
-              . filter (\g -> fst g == typ)
-              $ y
-          )
-    )
+toData typ = mapMaybe $ \(x, Sort y) -> f (x, lookup typ y)
+  where
+    f (x, Just y) = Just (x, y)
+    f _ = Nothing
+
+-- toData typ =
+--   mapMaybe $
+--     \(x, Sort y) ->
+--       ( \case
+--           (v, Just w) -> Just (v, w)
+--           (_, Nothing) -> Nothing
+--       )
+--         ( x,
+--           ( \case
+--               v : _ -> Just v
+--               _ -> Nothing
+--           )
+--             . map snd
+--             . filter (\g -> fst g == typ)
+--             $ y
+--         )
 
 gPrice :: Datensatz -> Nat1
 gPrice (DS x _ _ _) = x
