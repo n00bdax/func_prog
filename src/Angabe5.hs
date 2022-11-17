@@ -238,7 +238,6 @@ type Gesamtpreis = Nat0
 
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
 sofort_erhaeltliche_Stueckzahl typ (A anbieter)
-  | null anbieter = (0, 0)
   | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
   | otherwise =
       foldl (\(a, b) (c, d) -> (a + c, b + d)) (0, 0)
