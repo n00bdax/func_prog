@@ -93,10 +93,10 @@ type Suchanfrage = Typ
 ----------------- helper functions ----------------
 
 toData :: Typ -> [(Haendler, Sortiment)] -> [(Haendler, Datensatz)]
-toData typ = mapMaybe $ \(x, Sort y) -> f (x, lookup typ y)
+toData typ = mapMaybe $ \(x, Sort y) -> justify (x, lookup typ y)
   where
-    f (x, Just y) = Just (x, y)
-    f _ = Nothing
+    justify (x, Just y) = Just (x, y)
+    justify _ = Nothing
 
 -- toData typ =
 --   mapMaybe $
@@ -238,6 +238,7 @@ type Gesamtpreis = Nat0
 
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
 sofort_erhaeltliche_Stueckzahl typ (A anbieter)
+  | null anbieter = (0,0)
   | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
   | otherwise =
       foldl (\(a, b) (c, d) -> (a + c, b + d)) (0, 0)

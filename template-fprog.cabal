@@ -45,16 +45,16 @@ test-suite fprog-tests
 
   -- If you want to add more test-files, add the modules here:
   other-modules:
-    TestSuite1
-    TestSuite2
-    TestSuite3
+    -- TestSuite1
+    -- TestSuite2
+    -- TestSuite3
     --TestSuite4
     TestSuite5
-    TestSuite6
-    TestSuite7
-    Angabe1_TestSuite
-    Angabe2_TestSuite
-    Angabe3_TestSuite
+    -- TestSuite6
+    -- TestSuite7
+    -- Angabe1_TestSuite
+    -- Angabe2_TestSuite
+    -- Angabe3_TestSuite
 --    Test5
 
   ghc-options:      -Wall
