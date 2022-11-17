@@ -166,10 +166,20 @@ hasDuplicates :: Eq a => [a] -> Bool
 hasDuplicates (x : xs) = elem x xs || hasDuplicates xs
 hasDuplicates _ = False
 
+check1 :: Anbieter -> Anbieter
+check1 a
+  | ist_nwgf a = wgf_fehler a
+  | otherwise = a
+
+check2 :: Anbieter -> Anbieter
+check2 a
+  | ist_nwgf a = error "Anbieterargumentfehler"
+  | otherwise = a
+
 class Wgf a where -- Wgf fuer `wohlgeformt'
   ist_wgf :: a -> Bool -- ist_wgf fuer `ist wohlgeformt'
   ist_nwgf :: a -> Bool -- ist_nwgf fuer `ist nicht wohlgeformt'
-  wgf_fehler :: a -> b
+  wgf_fehler :: a -> a
 
   -- Protoimplementierungen
   ist_wgf = not . ist_nwgf
@@ -189,21 +199,21 @@ instance Wgf Lieferausblick where
       subCheck _ _ = True
   ist_wgf _ = True
 
-  wgf_fehler :: Lieferausblick -> b
+  wgf_fehler :: Lieferausblick -> a
   wgf_fehler = error "Ausblickfehler"
 
 instance Wgf Sortiment where
   ist_nwgf :: Sortiment -> Bool
   ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (ist_nwgf . gLA . snd) x
 
-  wgf_fehler :: Sortiment -> b
+  wgf_fehler :: Sortiment -> a
   wgf_fehler = error "Sortimentfehler"
 
 instance Wgf Anbieter where
   ist_nwgf :: Anbieter -> Bool
   ist_nwgf (A x) = hasDuplicates (map fst x) || any (ist_nwgf . snd) x
 
-  wgf_fehler :: Anbieter -> b
+  wgf_fehler :: Anbieter -> a
   wgf_fehler = error "Anbieterfehler"
 
 -- Aufgabe A.5
@@ -211,15 +221,14 @@ instance Wgf Anbieter where
 type Haendlerliste = [Haendler]
 
 sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
-sofort_lieferfaehig typ (A anbieter)
-  | null anbieter = []
-  | ist_nwgf (A anbieter) = wgf_fehler (A anbieter)
-  | otherwise =
-      sortBy (comparing Down)
-        . map fst
-        . filter (\(_, x) -> gStock x > 0)
-        . toData typ
-        $ anbieter
+sofort_lieferfaehig typ =
+  sortBy (comparing Down)
+    . map fst
+    . filter (\(_, x) -> gStock x > 0)
+    . toData typ
+    . (\(A x) -> x)
+    . (\x -> if ist_nwgf x then wgf_fehler x else x)
+
 
 -- Aufgabe A.6
 
@@ -229,7 +238,6 @@ type Gesamtpreis = Nat0
 
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
 sofort_erhaeltliche_Stueckzahl typ (A anbieter)
-  | null anbieter = (0, 0)
   | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
   | otherwise =
       foldl (\(a, b) (c, d) -> (a + c, b + d)) (0, 0)
