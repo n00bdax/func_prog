@@ -1,15 +1,16 @@
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase   #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Use camelCase" #-}
 {-# HLINT ignore "Use sortOn" #-}
+{-# HLINT ignore "Redundant lambda" #-}
 module Angabe5 where
 
-import Data.Bifunctor
-import Data.List
-import Data.Maybe
-import Data.Ord
+import           Data.Bifunctor
+import           Data.List
+import           Data.Maybe
+import           Data.Ord
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
    2. Vervollständigen Sie auch die vorgegebenen Kommentaranfänge!
@@ -54,7 +55,7 @@ type Jahr = Nat2023
 
 data Lieferfenster = LF
   { quartal :: Quartal,
-    jahr :: Jahr
+    jahr    :: Jahr
   }
   deriving (Eq, Show)
 
@@ -68,10 +69,10 @@ instance Ord Lieferfenster where
 
 data Datensatz
   = DS
-      { preis_in_euro :: Nat1,
-        sofort_lieferbare_stueckzahl :: Nat0,
+      { preis_in_euro                        :: Nat1,
+        sofort_lieferbare_stueckzahl         :: Nat0,
         lieferbare_stueckzahl_im_Zeitfenster :: Lieferausblick,
-        skonto :: Skonto
+        skonto                               :: Skonto
       }
   | Nicht_im_Sortiment
   deriving (Eq, Show, Ord)
@@ -96,7 +97,7 @@ toData :: Typ -> [(Haendler, Sortiment)] -> [(Haendler, Datensatz)]
 toData typ = mapMaybe $ \(x, Sort y) -> justify (x, lookup typ y)
   where
     justify (x, Just y) = Just (x, y)
-    justify _ = Nothing
+    justify _           = Nothing
 
 -- toData typ =
 --   mapMaybe $
@@ -117,22 +118,22 @@ toData typ = mapMaybe $ \(x, Sort y) -> justify (x, lookup typ y)
 
 gPrice :: Datensatz -> Nat1
 gPrice (DS x _ _ _) = x
-gPrice _ = 0
+gPrice _            = 0
 
 gPriceRed :: Datensatz -> Double
-gPriceRed (DS x _ _ DreiProzent) = fromIntegral x * 0.97
+gPriceRed (DS x _ _ DreiProzent)  = fromIntegral x * 0.97
 gPriceRed (DS x _ _ FuenfProzent) = fromIntegral x * 0.95
-gPriceRed (DS x _ _ ZehnProzent) = fromIntegral x * 0.9
-gPriceRed (DS x _ _ _) = fromIntegral x
-gPriceRed _ = 0
+gPriceRed (DS x _ _ ZehnProzent)  = fromIntegral x * 0.9
+gPriceRed (DS x _ _ _)            = fromIntegral x
+gPriceRed _                       = 0
 
 gStock :: Datensatz -> Nat0
 gStock (DS _ x _ _) = x
-gStock _ = 0
+gStock _            = 0
 
 gLA :: Datensatz -> Lieferausblick
 gLA (DS _ _ x _) = x
-gLA _ = LA []
+gLA _            = LA []
 
 -- gStockBy :: Datensatz -> Lieferfenster -> Stueckzahl
 -- gStockBy (DS _ _ (LA x) _) lff = (\a -> if null a then 0 else (snd.head) a)
@@ -148,7 +149,7 @@ gStockBy :: Datensatz -> Lieferfenster -> Stueckzahl
 gStockBy (DS _ _ (LA x) _) lff =
   ( \case
       (a : _) -> (snd a)
-      _ -> 0
+      _       -> 0
   )
     . filter (\a -> fst a == lff)
     $ x
@@ -156,7 +157,7 @@ gStockBy _ _ = 0
 
 getSkonto :: Datensatz -> Skonto
 getSkonto (DS _ _ _ x) = x
-getSkonto _ = Kein_Skonto
+getSkonto _            = Kein_Skonto
 
 trim2MinSnd :: Ord b => [(a, b)] -> [(a, b)]
 trim2MinSnd (x : xs) = filter (\a -> snd a == foldl min (snd x) (map snd xs)) (x : xs)
@@ -164,7 +165,7 @@ trim2MinSnd _ = []
 
 hasDuplicates :: Eq a => [a] -> Bool
 hasDuplicates (x : xs) = elem x xs || hasDuplicates xs
-hasDuplicates _ = False
+hasDuplicates _        = False
 
 check1 :: Anbieter -> Anbieter
 check1 a
@@ -199,21 +200,22 @@ instance Wgf Lieferausblick where
       subCheck _ _ = True
   ist_wgf _ = True
 
-  wgf_fehler :: Lieferausblick -> a
+  wgf_fehler :: Lieferausblick -> Lieferausblick
   wgf_fehler = error "Ausblickfehler"
+
 
 instance Wgf Sortiment where
   ist_nwgf :: Sortiment -> Bool
   ist_nwgf (Sort x) = hasDuplicates (map fst x) || any (ist_nwgf . gLA . snd) x
 
-  wgf_fehler :: Sortiment -> a
+  wgf_fehler :: Sortiment -> Sortiment
   wgf_fehler = error "Sortimentfehler"
 
 instance Wgf Anbieter where
   ist_nwgf :: Anbieter -> Bool
   ist_nwgf (A x) = hasDuplicates (map fst x) || any (ist_nwgf . snd) x
 
-  wgf_fehler :: Anbieter -> a
+  wgf_fehler :: Anbieter -> Anbieter
   wgf_fehler = error "Anbieterfehler"
 
 -- Aufgabe A.5
@@ -227,8 +229,7 @@ sofort_lieferfaehig typ =
     . filter (\(_, x) -> gStock x > 0)
     . toData typ
     . (\(A x) -> x)
-    . (\x -> if ist_nwgf x then wgf_fehler x else x)
-
+    . (\x -> if ist_nwgf x then error "Anbieterargumentfehler" x else x)
 
 -- Aufgabe A.6
 
@@ -238,7 +239,7 @@ type Gesamtpreis = Nat0
 
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
 sofort_erhaeltliche_Stueckzahl typ (A anbieter)
-  | null anbieter = (0,0)
+  | null anbieter = (0, 0)
   | ist_nwgf (A anbieter) = error "Anbieterargumentfehler"
   | otherwise =
       foldl (\(a, b) (c, d) -> (a + c, b + d)) (0, 0)
@@ -280,3 +281,12 @@ guenstigste_Lieferanten_im_Lieferfenster typ lff n (A anbieter)
         . filter (\x -> gStockBy (snd x) lff >= n)
         . toData typ
         $ anbieter
+
+
+unwrap1 :: Anbieter -> [(Haendler, [(Typ, Datensatz)])]
+unwrap1 = map (second unwrap2) . (\(A x) -> x)
+
+unwrap2 :: Sortiment -> [(Typ, Datensatz)]
+unwrap2 = \(Sort x) -> x
+
+

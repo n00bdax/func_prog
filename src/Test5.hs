@@ -258,15 +258,18 @@ tests =
     "[ A.1 - 2 ]" ~: ist_wgf sortf2 ~?= False,
     "[ A.1 - 3 ]" ~: ist_nwgf sortf1 ~?= True,
     "[ A.1 - 4 ]" ~: ist_nwgf sort3 ~?= False,
+
     "[ A.1 - 5 ]" ~: ist_wgf anb1 ~?= True,
     "[ A.1 - 6 ]" ~: ist_wgf anbf1 ~?= False,
     "[ A.1 - 7 ]" ~: ist_nwgf anbf2 ~?= True,
     "[ A.1 - 8 ]" ~: ist_nwgf anb2 ~?= False,
+    
     "[ A.1 - 9 ]" ~: ist_wgf lab6 ~?= True,
     "[ A.1 - 10 ]" ~: ist_wgf labf ~?= False,
     "[ A.1 - 11 ]" ~: ist_nwgf labf ~?= True,
     "[ A.1 - 12 ]" ~: ist_nwgf lab3 ~?= False,
     "[ A.1 - 13 ]" ~: ist_wgf lab0 ~?= True,
+
     "[ A.5 - 1 ]" ~: sofort_lieferfaehig (M M1) anb1 ~?= [H5, H2],
     "[ A.5 - 2 ]" ~: sofort_lieferfaehig (T T3) anb1 ~?= [H7, H3, H1],
     "[ A.5 - 3 ]" ~: sofort_lieferfaehig (T T4) anb2 ~?= [H3, H1],
@@ -274,6 +277,7 @@ tests =
     "[ A.5 - 5 ]" ~: sofort_lieferfaehig (T T2) anb2 ~?= [H3],
     "[ A.5 - 6 ]" ~: sofort_lieferfaehig (M M5) anb1 ~?= [H10, H9, H2, H1],
     "[ A.5 - 7 ]" ~: sofort_lieferfaehig (S S1) anb1 ~?= [H5, H4],
+
     "[ A.6 - 1 ]" ~: sofort_erhaeltliche_Stueckzahl (M M1) anb1 ~?= (6, 618),
     "[ A.6 - 2 ]" ~: sofort_erhaeltliche_Stueckzahl (T T3) anb1 ~?= (9, 1107),
     "[ A.6 - 3 ]" ~: sofort_erhaeltliche_Stueckzahl (T T4) anb2 ~?= (6, 618),
@@ -281,6 +285,7 @@ tests =
     "[ A.6 - 5 ]" ~: sofort_erhaeltliche_Stueckzahl (T T2) anb2 ~?= (3, 309),
     "[ A.6 - 6 ]" ~: sofort_erhaeltliche_Stueckzahl (M M5) anb1 ~?= (12, 1416),
     "[ A.6 - 7 ]" ~: sofort_erhaeltliche_Stueckzahl (S S1) anb1 ~?= (6, 618),
+
     "[ A.7 - 1 ]" ~: guenstigste_Lieferanten (M M1) (LF Q1 2023) anb1 ~?= Just [H5, H2],
     "[ A.7 - 2 ]" ~: guenstigste_Lieferanten (T T3) (LF Q2 2023) anb1 ~?= Just [H7],
     "[ A.7 - 3 ]" ~: guenstigste_Lieferanten (T T4) (LF Q3 2023) anb2 ~?= Just [H3, H1],
@@ -288,6 +293,7 @@ tests =
     "[ A.7 - 5 ]" ~: guenstigste_Lieferanten (T T2) (LF Q1 2024) anb2 ~?= Just [H3],
     "[ A.7 - 6 ]" ~: guenstigste_Lieferanten (M M5) (LF Q2 2024) anb1 ~?= Just [H9],
     "[ A.7 - 7 ]" ~: guenstigste_Lieferanten (S S1) (LF Q1 2050) anb1 ~?= Nothing,
+
     "[ A.8 - 1 ]" ~: guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 1 anb1 ~?= [(H5, EUR {euro = 100}), (H2, EUR {euro = 100})],
     "[ A.8 - 2 ]" ~: guenstigste_Lieferanten_im_Lieferfenster (T T3) (LF Q2 2023) 2 anb1 ~?= [(H7, EUR {euro = 190})],
     "[ A.8 - 3 ]" ~: guenstigste_Lieferanten_im_Lieferfenster (T T4) (LF Q3 2023) 3 anb2 ~?= [],
@@ -295,15 +301,19 @@ tests =
     "[ A.8 - 5 ]" ~: guenstigste_Lieferanten_im_Lieferfenster (T T3) (LF Q1 2024) 5 anb1 ~?= [(H7, EUR {euro = 480})],
     "[ A.8 - 6 ]" ~: guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q2 2024) 6 anb1 ~?= [(H1, EUR 1090)],
     "[ A.8 - 7 ]" ~: guenstigste_Lieferanten_im_Lieferfenster (S S1) (LF Q1 2050) 7 anb1 ~?= [],
-    "[ A.5 - f1 ]" ~: TestCase $ assertError "Anbieterfehler" (sofort_lieferfaehig (M M1) anbf1),
-    "[ A.5 - f2 ]" ~: TestCase $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T4) anbf2),
-    "[ A.5 - f3 ]" ~: TestCase $ assertError "Anbieterfehler" (sofort_lieferfaehig (T T2) anbf3),
+
+    "[ A.5 - f1 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (sofort_lieferfaehig (M M1) anbf1),
+    "[ A.5 - f2 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (sofort_lieferfaehig (T T4) anbf2),
+    "[ A.5 - f3 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (sofort_lieferfaehig (T T2) anbf3),
+
     "[ A.6 - f1 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (S S3) anbf1),
     "[ A.6 - f2 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (M M2) anbf2),
     "[ A.6 - f3 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (sofort_erhaeltliche_Stueckzahl (M M4) anbf3),
+
     "[ A.7 - f1 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf1),
     "[ A.7 - f2 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M5) (LF Q1 2023) anbf2),
     "[ A.7 - f3 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten (M M1) (LF Q1 2023) anbf3),
+
     "[ A.8 - f1 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf1),
     "[ A.8 - f2 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q1 2023) 0 anbf2),
     "[ A.8 - f3 ]" ~: TestCase $ assertError "Anbieterargumentfehler" (guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 2023) 1 anbf3),
