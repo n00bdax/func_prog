@@ -50,12 +50,12 @@ test-suite fprog-tests
     -- TestSuite3
     -- TestSuite4
     -- TestSuite5
-    -- TestSuite6
+    TestSuite6
     -- TestSuite7
     -- Angabe1_TestSuite
     -- Angabe2_TestSuite
     -- Angabe3_TestSuite
-    Angabe4_TestSuite
+    -- Angabe4_TestSuite
     -- Angabe5_TestSuite
     -- Angabe6_TestSuite
     -- Angabe6_TestSuite

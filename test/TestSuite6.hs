@@ -5,7 +5,6 @@ import Test.Tasty.QuickCheck as QC
 import Test.Tasty.HUnit
 
 import Data.List
-import Data.Ord
 
 spec :: TestTree
 spec = testGroup "Angabe6" [ properties, unitTests]
