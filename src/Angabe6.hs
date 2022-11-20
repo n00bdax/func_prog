@@ -49,17 +49,17 @@ data Typ
 instance Enum Typ where
   toEnum :: Int -> Typ
   toEnum x
-    | x <= maxM = M (toEnum x :: Waschmaschine)
-    | x <= maxM + maxT + 1 = T ((toEnum $ x - maxM - 1) :: Waeschetrockner)
-    | otherwise = S ((toEnum $ x - maxT - maxM - 2) :: Waescheschleuder)
+    | x < limit1 = M (toEnum x :: Waschmaschine)
+    | x < limit2 = T ((toEnum $ x - limit1) :: Waeschetrockner)
+    | otherwise = S ((toEnum $ x - limit2) :: Waescheschleuder)
     where
-      maxM = fromEnum (maxBound :: Waschmaschine)
-      maxT = fromEnum (maxBound :: Waeschetrockner)
+      limit1 = 1 + fromEnum (maxBound :: Waschmaschine)
+      limit2 = 1 + fromEnum (maxBound :: Waeschetrockner) + limit1
   fromEnum :: Typ -> Int
   fromEnum (M x) = fromEnum x
   fromEnum (T x) = fromEnum x + fromEnum (maxBound :: Waschmaschine) + 1
   fromEnum (S x) = fromEnum x + fromEnum (maxBound :: Waschmaschine) + fromEnum (maxBound :: Waeschetrockner) + 2
-
+  
 instance Bounded Typ where
   minBound :: Typ
   minBound = M minBound
