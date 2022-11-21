@@ -125,7 +125,7 @@ type Suchanfrage = Typ
 -- Aufgabe A.1
 
 wg_la :: Lieferausblick -> [(Lieferfenster, Nat0)]
-wg_la (LA f) = map (\x -> (x, f x)) lList
+wg_la (LA f) = filter ((/=0) . snd) . map (\x -> (x, f x)) $ lList
 
 wg_so :: Sortiment -> [(Typ, Datensatz)]
 wg_so (Sort f) = map (\x -> (x, f x)) tList
@@ -187,29 +187,20 @@ class Wgf a where -- Wgf fuer `wohlgeformt'
   wgf_check :: a -> a
 
   -- Protoimplementierungen
-  ist_wgf = not . ist_nwgf
+  ist_wgf = const True
   ist_nwgf = not . ist_wgf
   wgf_check x = if ist_nwgf x then wgf_fehler x else x
   wgf_fehler = error "Argument fehlerhaft"
 
 instance Wgf Lieferausblick where
-  ist_wgf :: Lieferausblick -> Bool
-  ist_wgf = const True
-
   wgf_fehler :: Lieferausblick -> Lieferausblick
   wgf_fehler = error "Ausblickfehler"
 
 instance Wgf Sortiment where
-  ist_wgf :: Sortiment -> Bool
-  ist_wgf = const True
-
   wgf_fehler :: Sortiment -> Sortiment
   wgf_fehler = error "Sortimentfehler"
 
 instance Wgf Anbieter where
-  ist_wgf :: Anbieter -> Bool
-  ist_wgf = const True
-
   wgf_fehler :: Anbieter -> Anbieter
   wgf_fehler = error "Anbieterfehler"
 
