@@ -59,7 +59,7 @@ instance Enum Typ where
   fromEnum (M x) = fromEnum x
   fromEnum (T x) = fromEnum x + fromEnum (maxBound :: Waschmaschine) + 1
   fromEnum (S x) = fromEnum x + fromEnum (maxBound :: Waschmaschine) + fromEnum (maxBound :: Waeschetrockner) + 2
-  
+
 instance Bounded Typ where
   minBound :: Typ
   minBound = M minBound
@@ -209,11 +209,10 @@ instance Wgf Anbieter where
 type Haendlerliste = [Haendler]
 
 sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
-sofort_lieferfaehig typ = sortBy (comparing Down) . map fst . filter (\(_, x) -> gStock x > 0) . toData typ
-
-{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
-   ...
--}
+sofort_lieferfaehig typ = sortBy (comparing Down)
+                        . map fst
+                        . filter (\(_,x) -> gStock x > 0)
+                        . toData typ
 
 -- Aufgabe A.6
 
@@ -222,45 +221,32 @@ type Stueckzahl = Nat0
 type Gesamtpreis = Nat0
 
 sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
-sofort_erhaeltliche_Stueckzahl typ =
-  foldl (\(a, b) (c, d) -> (a + c, b + d)) (0, 0)
-    . map (\(_, x) -> (gStock x, gPrice x * gStock x))
-    . toData typ
-
-{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
-   ...
--}
+sofort_erhaeltliche_Stueckzahl typ = foldl (\(a,b) (c,d) -> (a+c,b+d)) (0, 0)
+                                   . map (\(_,x) -> (gStock x, gPrice x * gStock x))
+                                   . toData typ
 
 -- Aufgabe A.7
 
 type Preis = EUR
 
 guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Anbieter -> Maybe Haendlerliste
-guenstigste_Lieferanten typ lff =
-  (\x -> if null x then Nothing else Just x)
-    . sortBy (comparing Down)
-    . map fst
-    . trim2MinSnd
-    . map (second gPrice)
-    . filter (\x -> gStockBy (snd x) lff > 0)
-    . toData typ
+guenstigste_Lieferanten typ lff = (\x -> if null x then Nothing else Just x)
+                                . sortBy (comparing Down)
+                                . map fst
+                                . trim2MinSnd
+                                . map (second gPrice)
+                                . filter (\x -> gStockBy (snd x) lff > 0)
+                                . toData typ
 
-{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
-   ...
--}
 
 -- Aufgabe A.8
 
 type RabattierterPreis = EUR
 
 guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Anbieter -> [(Haendler, RabattierterPreis)]
-guenstigste_Lieferanten_im_Lieferfenster typ lff n =
-  sortBy (comparing $ Down . fst)
-    . trim2MinSnd
-    . map (\(x, y) -> (x, EUR $ (\a -> 10 * ceiling (a / 10)) (gPriceRed y * fromIntegral n)))
-    . filter (\x -> gStockBy (snd x) lff >= n)
-    . toData typ
+guenstigste_Lieferanten_im_Lieferfenster typ lff n = sortBy (comparing $ Down . fst)
+                                                   . trim2MinSnd
+                                                   . map (\(x, y) -> (x, EUR . (\a -> 10 * ceiling (a / 10)) $ gPriceRed y * fromIntegral n))
+                                                   . filter (\x -> gStockBy (snd x) lff >= n)
+                                                   . toData typ
 
-{- Knapp, aber gut nachvollziehbar geht die Implementierung folgendermassen vor:
-   ...
--}
