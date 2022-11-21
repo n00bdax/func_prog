@@ -1,3 +1,29 @@
+{-
+
+| How can this test-suite be executed?
+| 
+| You can execute the test-suite on g0 via:
+
+cabal repl -b base -b tasty -b tasty-hunit
+:l Assignment0_TestSuite1.hs
+main
+
+| It works the same on you local machine.
+| might require
+cabal repl -b base -b tasty -b tasty-hunit all
+| depending on cabal
+|
+| To execute the test with stack *locally* execute:
+
+stack ghci --package base --package tasty --package tasty-hunit
+:l Assignment0_TestSuite1.hs
+main
+
+| Please note, your submission must be located right next to the
+| test-suite on your filesystem.
+
+-}
+
 module TestSuite1 where
 
 import Angabe1 hiding (main, spec)

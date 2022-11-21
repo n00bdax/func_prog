@@ -1,3 +1,30 @@
+{-
+
+| How can this test-suite be executed?
+| 
+| You can execute the test-suite on g0 via:
+
+cabal repl -b base -b tasty -b tasty-hunit
+:l Assignment0_TestSuite1.hs
+main
+
+| It works the same on you local machine.
+| might require
+cabal repl -b base -b tasty -b tasty-hunit all
+| depending on cabal/GHC
+|
+
+| To execute the test with stack *locally* execute:
+
+stack ghci --package base --package tasty --package tasty-hunit
+:l Assignment0_TestSuite1.hs
+main
+
+| Please note, your submission must be located right next to the
+| test-suite on your filesystem.
+
+-}
+
 {-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -Wno-dodgy-imports #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
@@ -8,7 +35,26 @@
 
 module TestSuite6 where
 
-import           Angabe6
+import Angabe6
+    ( guenstigste_Lieferanten_im_Lieferfenster,
+      guenstigste_Lieferanten,
+      sofort_erhaeltliche_Stueckzahl,
+      sofort_lieferfaehig,
+      Datensatz(..),
+      Lieferausblick(..),
+      Sortiment(..),
+      Wgf(..),
+      Anbieter(..),
+      EUR(..),
+      Skonto(..),
+      Waschmaschine(..),
+      Waeschetrockner(..),
+      Waescheschleuder(..),
+      Typ(..),
+      Quartal(..),
+      Jahr(..),
+      Lieferfenster(..),
+      Haendler(..) )
 import           Control.Exception                      (ErrorCall (ErrorCallWithLocation),
                                                          evaluate, try)
 import           Test.Tasty

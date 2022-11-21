@@ -14,7 +14,7 @@ import Test.Tasty
 -- import qualified Angabe3_TestSuite
 -- import qualified TestSuite4
 -- import qualified Angabe4_TestSuite
-import qualified TestSuite5
+-- import qualified TestSuite5
 --import qualified Angabe5_TestSuite
 import qualified TestSuite6
 --import qualified Angabe6_TestSuite
@@ -35,9 +35,9 @@ tests = testGroup "Fprog Tests"
     -- ,Angabe3_TestSuite.spec
     -- TestSuite4.spec
     -- Angabe4_TestSuite.spec
-    TestSuite5.spec
+    -- TestSuite5.spec
     -- ,Angabe5_TestSuite.spec
-    ,TestSuite6.spec
+    TestSuite6.spec
     -- Angabe6_TestSuite.spec
     -- ,TestSuite7.spec
     -- ,Angabe7_TestSuite.spec

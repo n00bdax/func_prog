@@ -6,11 +6,11 @@ build-type:    Simple
 library
   -- Modules exported by the library.
   exposed-modules:
-    Angabe1
-    Angabe2
-    Angabe3
-    Angabe4
-    Angabe5
+    -- Angabe1
+    -- Angabe2
+    -- Angabe3
+    -- Angabe4
+    -- Angabe5
     Angabe6
     Angabe7
 
