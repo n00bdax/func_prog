@@ -1,7 +1,7 @@
 {-
 
 | How can this test-suite be executed?
-| 
+|
 | You can execute the test-suite on g0 via:
 
 cabal repl -b base -b tasty -b tasty-hunit
@@ -35,26 +35,25 @@ main
 
 module TestSuite6 where
 
-import Angabe6
-    ( guenstigste_Lieferanten_im_Lieferfenster,
-      guenstigste_Lieferanten,
-      sofort_erhaeltliche_Stueckzahl,
-      sofort_lieferfaehig,
-      Datensatz(..),
-      Lieferausblick(..),
-      Sortiment(..),
-      Wgf(..),
-      Anbieter(..),
-      EUR(..),
-      Skonto(..),
-      Waschmaschine(..),
-      Waeschetrockner(..),
-      Waescheschleuder(..),
-      Typ(..),
-      Quartal(..),
-      Jahr(..),
-      Lieferfenster(..),
-      Haendler(..) )
+import           Angabe6                                (Anbieter (..),
+                                                         Datensatz (..),
+                                                         EUR (..),
+                                                         Haendler (..),
+                                                         Jahr (..),
+                                                         Lieferausblick (..),
+                                                         Lieferfenster (..),
+                                                         Quartal (..),
+                                                         Skonto (..),
+                                                         Sortiment (..),
+                                                         Typ (..),
+                                                         Waescheschleuder (..),
+                                                         Waeschetrockner (..),
+                                                         Waschmaschine (..),
+                                                         Wgf (..),
+                                                         guenstigste_Lieferanten,
+                                                         guenstigste_Lieferanten_im_Lieferfenster,
+                                                         sofort_erhaeltliche_Stueckzahl,
+                                                         sofort_lieferfaehig)
 import           Control.Exception                      (ErrorCall (ErrorCallWithLocation),
                                                          evaluate, try)
 import           Test.Tasty
@@ -300,7 +299,7 @@ lab4 =LA (\case
     --   (LF Q2 J2025) -> 0 -- duplicate
     --   (LF Q3 J2025) -> 0 -- duplicate
     --   (LF Q4 J2025) -> 0 -- duplicate
-      _ -> 0
+      _             -> 0
     )
 lab5 =LA (\case
       (LF Q3 J2024) -> 0 -- shuffled
