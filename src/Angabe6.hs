@@ -204,6 +204,9 @@ instance Wgf Anbieter where
   wgf_fehler :: Anbieter -> Anbieter
   wgf_fehler = error "Anbieterfehler"
 
+instance Show Anbieter where
+  show _ = "something"
+
 -- Aufgabe A.5
 
 type Haendlerliste = [Haendler]
