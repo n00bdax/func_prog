@@ -125,21 +125,21 @@ type Suchanfrage = Typ
 -- Aufgabe A.1
 
 wg_la :: Lieferausblick -> [(Lieferfenster, Nat0)]
-wg_la (LA f) = filter ((/=0) . snd) . map (\x -> (x, f x)) $ lList
+wg_la (LA f) = filter ((/=0) . snd) [(x,f x) |x <- lList]
 
 wg_so :: Sortiment -> [(Typ, Datensatz)]
-wg_so (Sort f) = map (\x -> (x, f x)) tList
+wg_so (Sort f) = [(x,f x) |x <- tList]
 
 wg_ab :: Anbieter -> [(Haendler, Sortiment)]
-wg_ab (A f) = map (\x -> (x, f x)) hList
+wg_ab (A f) = [(x,f x) |x <- hList]
 
 -- helper functions
 
 toData :: Typ -> Anbieter -> [(Haendler, Datensatz)]
-toData typ = mapMaybe ((\(x, y) -> justify (x, lookup typ y)) . second wg_so) . wg_ab
+toData typ = mapMaybe ((\(x, y) -> maybefy (x, lookup typ y)) . second wg_so) . wg_ab
   where
-    justify (x, Just y) = Just (x, y)
-    justify _           = Nothing
+    maybefy (x, Just y) = Just (x, y)
+    maybefy _           = Nothing
 
 gPrice :: Datensatz -> Nat1
 gPrice (DS x _ _ _) = x
@@ -196,6 +196,20 @@ instance Wgf Lieferausblick where
   wgf_fehler :: Lieferausblick -> Lieferausblick
   wgf_fehler = error "Ausblickfehler"
 
+  -- ist_wgf :: Lieferausblick -> Bool
+  -- ist_wgf a = mainCheck $ wg_la a
+  --   where
+  --     mainCheck :: [(Lieferfenster, Nat0)] -> Bool
+  --     mainCheck (x : xs) = subCheck x xs && mainCheck xs
+  --     mainCheck _ = True    
+
+  --     subCheck :: (Lieferfenster, Nat0) -> [(Lieferfenster, Nat0)] -> Bool
+  --     subCheck (x1, x2) ((y1, y2) : ys)
+  --           | x1 == y1 = x2 == y2 && subCheck (x1, x2) ys
+  --           | otherwise = subCheck (x1, x2) ys
+  --     subCheck _ _ = True
+
+
 instance Wgf Sortiment where
   wgf_fehler :: Sortiment -> Sortiment
   wgf_fehler = error "Sortimentfehler"
@@ -203,9 +217,6 @@ instance Wgf Sortiment where
 instance Wgf Anbieter where
   wgf_fehler :: Anbieter -> Anbieter
   wgf_fehler = error "Anbieterfehler"
-
-instance Show Anbieter where
-  show _ = "something"
 
 -- Aufgabe A.5
 
