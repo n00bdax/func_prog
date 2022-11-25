@@ -277,7 +277,7 @@ type RabattierterPreis = EUR
 guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Anbieter -> [(Haendler, RabattierterPreis)]
 guenstigste_Lieferanten_im_Lieferfenster typ lff n = sortBy (comparing $ Down . fst)
                                                    . trim2MinSnd
-                                                   . map (\(x, y) -> (x, EUR . (\a -> 10 * ceiling (a / 10)) $ gPriceRed y * fromIntegral n))
+                                                   . map (\(x, y) -> (x, EUR ((\a -> 10 * ceiling (a / 10)) $ gPriceRed y * fromIntegral n)))
                                                    . filter (\x -> gStockBy (snd x) lff >= n)
                                                    . toData typ
 
