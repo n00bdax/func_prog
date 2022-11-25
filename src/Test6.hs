@@ -38,8 +38,7 @@ import           Angabe6           (Anbieter (..), Datensatz (..), EUR (..),
                                     sofort_lieferfaehig, wg_ab, wg_la, wg_so)
 import           Control.Exception (ErrorCall (ErrorCallWithLocation), evaluate,
                                     try)
-import           Test.HUnit        (Test, Testable (test), assertFailure,
-                                    runTestTTAndExit, (@?=), (~:))
+import           Test.HUnit        
 
 main :: IO ()
 main = runTestTTAndExit $ test spec
@@ -305,12 +304,12 @@ spec =
     "[ A.7 - 5 ]"  ~: guenstigste_Lieferanten (T T2) (LF Q1 J2024) anb2 @?= Just [H3],
     "[ A.7 - 6 ]"  ~: guenstigste_Lieferanten (M M5) (LF Q2 J2024) anb1 @?= Just [H9],
 
-    "[ A.8 - 1 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 J2023) 1 anb1 @?= [(H5, EUR {euro = 100}), (H2, EUR {euro = 100})],
-    "[ A.8 - 2 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (T T3) (LF Q2 J2023) 2 anb1 @?= [(H7, EUR {euro = 190})],
-    "[ A.8 - 3 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (T T4) (LF Q3 J2023) 3 anb2 @?= [],
-    "[ A.8 - 4 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (S S3) (LF Q4 J2023) 4 anb2 @?= [],
-    "[ A.8 - 5 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (T T3) (LF Q1 J2024) 5 anb1 @?= [(H7, EUR {euro = 480})],
-    "[ A.8 - 6 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q2 J2024) 6 anb1 @?= [(H1, EUR 1090)],
+    "[ A.8 - 1 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (M M1) (LF Q1 J2023) 1 anb1 ~?= [(H5, EUR {euro = 100}), (H2, EUR {euro = 100})],
+    "[ A.8 - 2 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (T T3) (LF Q2 J2023) 2 anb1 ~?= [(H7, EUR {euro = 190})],
+    "[ A.8 - 3 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (T T4) (LF Q3 J2023) 3 anb2 ~?= [],
+    "[ A.8 - 4 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (S S3) (LF Q4 J2023) 4 anb2 ~?= [],
+    "[ A.8 - 5 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (T T3) (LF Q1 J2024) 5 anb1 ~?= [(H7, EUR {euro = 480})],
+    "[ A.8 - 6 ]"  ~: guenstigste_Lieferanten_im_Lieferfenster (M M5) (LF Q2 J2024) 6 anb1 ~?= [(H1, EUR 1090)],
 
     "True == True"  ~: True @?= True
     ]

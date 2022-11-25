@@ -125,7 +125,7 @@ type Suchanfrage = Typ
 -- Aufgabe A.1
 
 wg_la :: Lieferausblick -> [(Lieferfenster, Nat0)]
-wg_la (LA f) = filter ((/=0) . snd) [(x,f x) |x <- lList]
+wg_la (LA f) = [(x,f x) |x <- lList]
 
 wg_so :: Sortiment -> [(Typ, Datensatz)]
 wg_so (Sort f) = [(x,f x) |x <- tList]
@@ -140,6 +140,10 @@ toData typ = mapMaybe ((\(x, y) -> maybefy (x, lookup typ y)) . second wg_so) . 
   where
     maybefy (x, Just y) = Just (x, y)
     maybefy _           = Nothing
+
+-- this baller list comprehension is Mato's work
+-- toData :: Typ -> Anbieter -> [(Haendler, Datensatz)]
+-- toData typ an = [(h,d) | (h,s) <- wg_ab an, (t,d) <- wg_so s, t == typ]
 
 gPrice :: Datensatz -> Nat1
 gPrice (DS x _ _ _) = x
@@ -228,6 +232,9 @@ sofort_lieferfaehig typ = sortBy (comparing Down)
                         . filter (\(_,x) -> gStock x > 0)
                         . toData typ
 
+-- sofort_lieferfaehig :: Suchanfrage -> Anbieter -> Haendlerliste
+-- sofort_lieferfaehig typ an = sortBy (comparing Down)  [x |(x,y) <- toData typ an, gStock y > 0]
+
 -- Aufgabe A.6
 
 type Stueckzahl = Nat0
@@ -238,6 +245,10 @@ sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamt
 sofort_erhaeltliche_Stueckzahl typ = foldl (\(a,b) (c,d) -> (a+c,b+d)) (0, 0)
                                    . map (\(_,x) -> (gStock x, gPrice x * gStock x))
                                    . toData typ
+
+-- sofort_erhaeltliche_Stueckzahl :: Suchanfrage -> Anbieter -> (Stueckzahl, Gesamtpreis)
+-- sofort_erhaeltliche_Stueckzahl typ an = foldl (\(a,b) (c,d) -> (a+c,b+d)) (0, 0)
+--                                    [(gStock x, gPrice x * gStock x) | (_,x)<-toData typ an]
 
 -- Aufgabe A.7
 
@@ -252,6 +263,12 @@ guenstigste_Lieferanten typ lff = (\x -> if null x then Nothing else Just x)
                                 . filter (\x -> gStockBy (snd x) lff > 0)
                                 . toData typ
 
+-- guenstigste_Lieferanten :: Suchanfrage -> Lieferfenster -> Anbieter -> Maybe Haendlerliste
+-- guenstigste_Lieferanten typ lff an = (\x -> if null x then Nothing else Just x)
+--                                 . sortBy (comparing Down)
+--                                 . map fst
+--                                 . trim2MinSnd
+--                                 $ [(x,gPrice y) |(x,y) <- toData typ an, gStockBy y lff > 0]
 
 -- Aufgabe A.8
 
@@ -263,4 +280,13 @@ guenstigste_Lieferanten_im_Lieferfenster typ lff n = sortBy (comparing $ Down . 
                                                    . map (\(x, y) -> (x, EUR . (\a -> 10 * ceiling (a / 10)) $ gPriceRed y * fromIntegral n))
                                                    . filter (\x -> gStockBy (snd x) lff >= n)
                                                    . toData typ
+
+-- guenstigste_Lieferanten_im_Lieferfenster :: Suchanfrage -> Lieferfenster -> Stueckzahl -> Anbieter -> [(Haendler, RabattierterPreis)]
+-- guenstigste_Lieferanten_im_Lieferfenster typ lff n an = sortBy (comparing $ Down . fst)
+--                                                    . trim2MinSnd
+--                                                    $ [(x, EUR . (\b -> 10 * ceiling (b / 10)) $ gPriceRed y * fromIntegral n)
+--                                                    |(x,y) <- toData typ an, gStockBy y lff >= n]
+
+
+
 
