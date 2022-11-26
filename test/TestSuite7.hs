@@ -34,17 +34,6 @@ main
 
 module TestSuite7 where
 
-import           Control.Exception                      (ErrorCall (ErrorCallWithLocation),
-                                                         evaluate, try)
-import           Test.Tasty                             (TestTree,
-                                                         defaultMainWithIngredients,
-                                                         testGroup)
-import           Test.Tasty.HUnit                       (assertFailure,
-                                                         testCase, (@?=))
-import           Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
-
-
-
 import           Angabe7                                (AbLieferfenster,
                                                          Betroffen (..),
                                                          Betroffene_Haendler (..),
@@ -68,6 +57,14 @@ import           Angabe7                                (AbLieferfenster,
                                                          berichtige, lst2fkt_ab,
                                                          lst2fkt_la, lst2fkt_so,
                                                          preisanpassung)
+import           Control.Exception                      (ErrorCall (ErrorCallWithLocation),
+                                                         evaluate, try)
+import           Test.Tasty                             (TestTree,
+                                                         defaultMainWithIngredients,
+                                                         testGroup)
+import           Test.Tasty.HUnit                       (assertFailure,
+                                                         testCase, (@?=))
+import           Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
 import           Data.List                              (sort, sortBy)
 import           Data.Ord                               (Down (Down), comparing)
 
@@ -314,6 +311,12 @@ spec = testGroup "TestSuite7"
     testCase "berichtige 7" $ test3 (S S2) (LF Q3 2024) (berichtige (berichtige (pack m2) bh1 (LF Q2 2024)) bh2 (LF Q1 2024)) @?= (0,0),
     testCase "berichtige 8" $ test4 (S S2) (LF Q1 2025) 3  (berichtige (pack m1)bh1(LF Q1 2024)) @?= [(H8,EUR 543)],
     testCase "berichtige 9" $ test4 (S S2) (LF Q1 2025) 14 (berichtige (pack m2)bh1(LF Q1 2024)) @?= [],
+
+    -- test requiring Markt' deriving (Eq, Show)
+    testCase "length (show m1)" $ length (show m1) @?= 67222,
+    testCase "length (show m2)" $ length (show m2) @?= 67123,
+    testCase "Eq Markt True'"   $ m1 == m1 @?= True,
+    testCase "Eq Markt False'"  $ m1 == m2 @?= False,
 
 
     testCase "errors checks not included" $ True @?= True

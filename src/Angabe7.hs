@@ -87,8 +87,6 @@ instance Enum Lieferfenster where
 
   fromEnum :: Lieferfenster -> Int
   fromEnum (LF q y) = fromEnum y * 4 + fromEnum q
-  
-
 
 
 data Datensatz
@@ -106,6 +104,7 @@ data Datensatz'
            skonto'                               :: Skonto
         }
      | Nicht_im_Sortiment'
+  deriving (Eq, Ord, Show)
 
 
 data Haendler = H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10
@@ -129,31 +128,37 @@ tList = [minBound .. maxBound]
 hList :: [Haendler]
 hList = [minBound .. maxBound]
 
+lList :: [Lieferfenster]
+lList = [LF a b|  b <- [2023..],a <- [minBound..maxBound]]
+
 
 
 
 newtype Lieferausblick  = LA (Lieferfenster -> Nat0)
-newtype Lieferausblick' = LA' [(Lieferfenster,Nat0)]  deriving (Eq, Ord, Show)
+newtype Lieferausblick' = LA' [(Lieferfenster,Nat0)]
+  deriving (Eq, Ord, Show)
 
 newtype Sortiment  = Sort (Typ -> Datensatz)
 newtype Sortiment' = Sort' [(Typ,Datensatz')]
+  deriving (Eq, Ord, Show)
 
 newtype Markt  = Mt (Haendler -> Sortiment)
 newtype Markt' = Mt' [(Haendler,Sortiment')]
+  deriving (Eq, Ord, Show)
 
 -- Aufgabe A.1
 
 lst2fkt_la :: [(Lieferfenster,Nat0)] -> (Lieferfenster -> Nat0)
 lst2fkt_la x k = (\case Just a -> a
-                        _ -> error "undefiniert") $ lookup k x
+                        _      -> error "undefiniert") $ lookup k x
 
 lst2fkt_so :: [(Typ,Datensatz')] -> (Typ -> Datensatz)
 lst2fkt_so x k = (\case Just (DS' a b c d) -> DS a b (lst2fkt_la' c) d
-                        _ -> error "undefiniert") $ lookup k x
+                        _                  -> error "undefiniert") $ lookup k x
 
 lst2fkt_ab :: [(Haendler,Sortiment')] -> (Haendler -> Sortiment)
 lst2fkt_ab x k = (\case Just a -> lst2fkt_so' a
-                        _ -> error "undefiniert") $ lookup k x 
+                        _      -> error "undefiniert") $ lookup k x
 
 
 -- Aufgabe A.2
@@ -178,12 +183,12 @@ preisanpassung markt =
   reconM
   . map (second
   $ map (\(x,y)->
-      let v = lookup x minPriceList
-      in case v of
-        Nothing -> (x,y)
-        Just z  -> (x, sPrice y z)))
-   . deconM
-   $ markt
+    let v = lookup x minPriceList
+    in case v of
+    Nothing -> (x,y)
+    Just z  -> (x, sPrice y z)))
+  . deconM
+  $ markt
 
   where
     minPriceList :: [(Typ,Nat1)]
@@ -211,7 +216,7 @@ berichtige markt (BH bh) al =
   reconM
   . map (\(a,b)->
       if bh a == Betroffen
-      then (a,map (\(c,d) -> (c,noStockFrom d al)) b)      
+      then (a,map (\(c,d) -> (c,noStockFrom d al)) b)
       else (a,b))
   . deconM
   $ markt
@@ -251,7 +256,7 @@ gStockBy _                 = const 0
 
 noStockFrom :: Datensatz -> Lieferfenster -> Datensatz
 noStockFrom (DS a b (LA c) d) t = DS a b (LA (\x-> if x<t then c x else 0)) d
-noStockFrom _ _ = Nicht_im_Sortiment
+noStockFrom _ _                 = Nicht_im_Sortiment
 
 getSkonto :: Datensatz -> Skonto
 getSkonto (DS _ _ _ x) = x

@@ -20,13 +20,6 @@ runhaskell Test7
 
 module Test7 where
 
-import           Control.Exception (ErrorCall (ErrorCallWithLocation), evaluate,
-                                    try)
-import           Test.HUnit        (Test, Testable (test), assertFailure,
-                                    runTestTTAndExit, (@?=), (~:))
-
-
-
 import           Angabe7           (AbLieferfenster, Betroffen (..),
                                     Betroffene_Haendler (..), Datensatz (..),
                                     Datensatz' (..), EUR (..), Haendler (..),
@@ -37,8 +30,12 @@ import           Angabe7           (AbLieferfenster, Betroffen (..),
                                     Waescheschleuder (..), Waeschetrockner (..),
                                     Waschmaschine (..), berichtige, lst2fkt_ab,
                                     lst2fkt_la, lst2fkt_so, preisanpassung)
-import           Data.List         (sort, sortBy)
+import           Test.HUnit        (Test, Testable (test), assertFailure,
+                                    runTestTTAndExit, (@?=), (~:))
+import           Control.Exception (ErrorCall (ErrorCallWithLocation), evaluate,
+                                    try)
 import           Data.Ord          (Down (Down), comparing)
+import           Data.List         (sort, sortBy)
 
 
 main :: IO ()
@@ -257,7 +254,7 @@ spec =
     -- testCase "lst2fkt_la error" $ assertError "undefiniert" (length.sort.fkt2lst_la_f.lst2fkt_la.fkt2lst_la_f.lst2fkt_la.unLA $ labf),
     -- testCase "lst2fkt_so error" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_so.lst2fkt_so.unSort $ sortf1),
     -- testCase "lst2fkt_ab error 1" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf1),
-    -- testCase "lst2fkt_ab error 2" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf2),
+    -- "lst2fkt_ab error 2" ~: TestCase $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf2),
 
     "preisanpassung 1" ~: (test1 (M M2) . preisanpassung $ pack m1) @?= [H2,H3,H5,H7,H9,H10],
     "preisanpassung 2" ~: (test1 (T T1) . preisanpassung $ pack m1) @?= [],
@@ -282,6 +279,11 @@ spec =
     "berichtige 8" ~: test4 (S S2) (LF Q1 2025) 3  (berichtige (pack m1)bh1(LF Q1 2024)) @?= [(H8,EUR 543)],
     "berichtige 9" ~: test4 (S S2) (LF Q1 2025) 14 (berichtige (pack m2)bh1(LF Q1 2024)) @?= [],
 
+    -- test requiring Markt' deriving (Eq, Show)
+    "length (show m1)" ~: length (show m1) @?= 67222,
+    "length (show m2)" ~: length (show m2) @?= 67123,
+    "Eq Markt' True"   ~: m1 == m1 @?= True,
+    "Eq Markt' False"  ~: m1 == m2 @?= False,
 
     "errors checks not included" ~: True @?= True
     ]
