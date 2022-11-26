@@ -14,17 +14,9 @@ runhaskell Test6
 
 -}
 
-{-# LANGUAGE LambdaCase   #-}
-{-# OPTIONS_GHC -Wno-dodgy-imports #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
+{-# LANGUAGE LambdaCase #-}
 
-{-# HLINT ignore "Unused LANGUAGE pragma" #-}
-{-# HLINT ignore "Use infix" #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
-
-module TestSuite6 where
+module Test6 where
 
 import           Angabe6           (Anbieter (..), Datensatz (..), EUR (..),
                                     Haendler (..), Jahr (..),
@@ -38,7 +30,8 @@ import           Angabe6           (Anbieter (..), Datensatz (..), EUR (..),
                                     sofort_lieferfaehig, wg_ab, wg_la, wg_so)
 import           Control.Exception (ErrorCall (ErrorCallWithLocation), evaluate,
                                     try)
-import           Test.HUnit        
+import           Test.HUnit        (Test, Testable (test), assertFailure,
+                                    runTestTTAndExit, (@?=), (~:), (~?=))
 
 main :: IO ()
 main = runTestTTAndExit $ test spec

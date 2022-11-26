@@ -28,29 +28,26 @@ main
 
 -}
 
-{-# LANGUAGE LambdaCase   #-}
+{-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-{-# HLINT ignore "Unused LANGUAGE pragma" #-}
-{-# HLINT ignore "Use infix" #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# HLINT ignore "Use camelCase" #-}
 {-# HLINT ignore "Use sortOn" #-}
 
 module TestSuite7 where
 
-import Control.Exception
-    ( try, evaluate, ErrorCall(ErrorCallWithLocation) )
-import Data.Bifunctor ( Bifunctor(second) )
-import Test.Tasty
-    ( defaultMainWithIngredients, testGroup, TestTree )
-import Test.Tasty.HUnit ( testCase, (@?=), assertFailure )
-import Test.Tasty.Ingredients.ConsoleReporter
-    ( consoleTestReporter )
+import           Control.Exception                      (ErrorCall (ErrorCallWithLocation),
+                                                         evaluate, try)
+import           Data.Bifunctor                         (Bifunctor (second))
+import           Test.Tasty                             (TestTree,
+                                                         defaultMainWithIngredients,
+                                                         testGroup)
+import           Test.Tasty.HUnit                       (assertFailure,
+                                                         testCase, (@?=))
+import           Test.Tasty.Ingredients.ConsoleReporter (consoleTestReporter)
 
 
 
-import           Angabe7                                (Betroffen (..),
+import           Angabe7                                (AbLieferfenster,
+                                                         Betroffen (..),
                                                          Betroffene_Haendler (..),
                                                          Datensatz (..),
                                                          Datensatz' (..),
@@ -69,10 +66,11 @@ import           Angabe7                                (Betroffen (..),
                                                          Waescheschleuder (..),
                                                          Waeschetrockner (..),
                                                          Waschmaschine (..),
-                                                         AbLieferfenster,
-                                                         lst2fkt_la, lst2fkt_so, lst2fkt_ab, preisanpassung, berichtige)
-import           Data.List
-import           Data.Ord
+                                                         berichtige, lst2fkt_ab,
+                                                         lst2fkt_la, lst2fkt_so,
+                                                         preisanpassung)
+import           Data.List                              (sort, sortBy)
+import           Data.Ord                               (Down (Down), comparing)
 
 
 main :: IO ()
@@ -249,7 +247,7 @@ lab5 = LA'
       (LF Q4 2024, 0)
     ]
 labf = LA'
-    [ 
+    [
       (LF Q2 2023, 11),
       (LF Q3 2023, 12),
       (LF Q4 2023, 13),
@@ -318,7 +316,7 @@ spec = testGroup "TestSuite7"
     testCase "berichtige 8" $ test4 (S S2) (LF Q1 2025) 3  (berichtige (pack m1)bh1(LF Q1 2024)) @?= [(H8,EUR 543)],
     testCase "berichtige 9" $ test4 (S S2) (LF Q1 2025) 14 (berichtige (pack m2)bh1(LF Q1 2024)) @?= [],
 
-                
+
     testCase "errors checks not included" $ True @?= True
     ]
 
@@ -413,4 +411,4 @@ unMt :: Markt' -> [(Haendler, Sortiment')]
 unMt (Mt' x)  = x
 
 pack :: Markt' -> Markt
-pack = Mt . lst2fkt_ab . unMt 
+pack = Mt . lst2fkt_ab . unMt
