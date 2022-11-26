@@ -22,7 +22,6 @@ module Test7 where
 
 import           Control.Exception (ErrorCall (ErrorCallWithLocation), evaluate,
                                     try)
-import           Data.Bifunctor    (Bifunctor (second))
 import           Test.HUnit        (Test, Testable (test), assertFailure,
                                     runTestTTAndExit, (@?=), (~:))
 
@@ -297,8 +296,7 @@ lList = [LF Q1 2023,LF Q2 2023,LF Q3 2023,LF Q4 2023
         ,LF Q1 2024,LF Q2 2024,LF Q3 2024,LF Q4 2024
         ,LF Q1 2025,LF Q2 2025,LF Q3 2025,LF Q4 2025]
 lListf :: [Lieferfenster]
-lListf = repeat(LF Q1 2023)
-
+lListf = repeat (LF Q1 2023)
 
 toData :: Typ -> Markt -> [(Haendler, Datensatz)]
 toData typ (Mt m) = [(a,(\(Sort x) -> x typ) (m a)) | a <- hList]
@@ -319,17 +317,9 @@ gStock :: Datensatz -> Nat0
 gStock (DS _ x _ _) = x
 gStock _            = 0
 
-gLA :: Datensatz -> Lieferausblick
-gLA (DS _ _ x _) = x
-gLA _            = LA $ const 0
-
 gStockBy :: Datensatz -> Lieferfenster -> Nat0
 gStockBy (DS _ _ (LA x) _) = x
 gStockBy _                 = const 0
-
-getSkonto :: Datensatz -> Skonto
-getSkonto (DS _ _ _ x) = x
-getSkonto _            = Kein_Skonto
 
 trim2MinSnd :: Ord b => [(a, b)] -> [(a, b)]
 trim2MinSnd (x : xs) = filter (\a -> snd a == foldl min (snd x) (map snd xs)) (x : xs)
@@ -355,7 +345,6 @@ test4 t l n = sortBy (comparing $ Down . fst)
            . filter (\(_,x) -> gStockBy x l >= n)
            . toData t
 
-
 fkt2lst_la :: (Lieferfenster -> Nat0) -> [(Lieferfenster,Nat0)]
 fkt2lst_la y = map (\x -> (x,y x)) lList
 
@@ -373,8 +362,10 @@ fkt2lst_ab y = map (\x -> (x,(\(Sort a) -> Sort' $ fkt2lst_so a)  $ y x)) hList
 
 unLA :: Lieferausblick' -> [(Lieferfenster, Nat0)]
 unLA (LA' x) = x
+
 unSort :: Sortiment' -> [(Typ, Datensatz')]
 unSort (Sort' x) = x
+
 unMt :: Markt' -> [(Haendler, Sortiment')]
 unMt (Mt' x)  = x
 
