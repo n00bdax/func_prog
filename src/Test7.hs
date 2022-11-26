@@ -301,7 +301,8 @@ lListf = repeat(LF Q1 2023)
 
 
 toData :: Typ -> Markt -> [(Haendler, Datensatz)]
-toData typ (Mt m) = map (second (\(Sort x) -> x typ) . \x-> (x,m x)) hList
+toData typ (Mt m) = [(a,(\(Sort x) -> x typ) (m a)) | a <- hList]
+                 -- map (second (\(Sort x) -> x typ) . \x-> (x,m x)) hList
 
 gPrice :: Datensatz -> Nat1
 gPrice (DS x _ _ _) = x
