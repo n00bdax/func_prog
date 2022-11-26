@@ -11,7 +11,7 @@ library
     -- Angabe3
     -- Angabe4
     -- Angabe5
-    Angabe6
+    -- Angabe6
     Angabe7
 
   build-depends:
@@ -50,15 +50,15 @@ test-suite fprog-tests
     -- TestSuite3
     -- TestSuite4
     -- TestSuite5
-    TestSuite6
-    -- TestSuite7
+    -- TestSuite6
+    TestSuite7
     -- Angabe1_TestSuite
     -- Angabe2_TestSuite
     -- Angabe3_TestSuite
     -- Angabe4_TestSuite
     -- Angabe5_TestSuite
     -- Angabe6_TestSuite
-    -- Angabe6_TestSuite
+    -- Angabe7_TestSuite
 --    Test5
 
   ghc-options:      -Wall
