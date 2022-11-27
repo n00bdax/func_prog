@@ -136,7 +136,7 @@ lst2fkt_la = lst2fkt id
 
 lst2fkt_so :: [(Typ,Datensatz')] -> (Typ -> Datensatz)
 lst2fkt_so = lst2fkt (\case (DS' a b c d) -> DS a b (lst2fkt_la' c) d
-                            _             -> error "undefiniert")
+                            _             -> error "unvollständiger Datensatz")
 
 lst2fkt_ab :: [(Haendler,Sortiment')] -> (Haendler -> Sortiment)
 lst2fkt_ab = lst2fkt lst2fkt_so'
