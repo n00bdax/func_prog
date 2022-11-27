@@ -283,11 +283,13 @@ spec = testGroup "TestSuite7"
     testCase "lst2fkt_so"  $ (sort.map fst.fkt2lst_so.lst2fkt_so.unSort) sort1 @?= (sort.map fst.unSort) sort1,
     testCase "lst2fkt_ab"  $ (sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt) m1 @?= (sort.map fst.unMt ) m1,
 
-    -- can't get them to work somehow
-    -- testCase "lst2fkt_la error" $ assertError "undefiniert" (length.sort.fkt2lst_la_f.lst2fkt_la.fkt2lst_la_f.lst2fkt_la.unLA $ labf),
-    -- testCase "lst2fkt_so error" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_so.lst2fkt_so.unSort $ sortf1),
-    -- testCase "lst2fkt_ab error 1" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf1),
-    -- testCase "lst2fkt_ab error 2" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf2),
+    -- there's a chance these malfunction depending on platform
+    -- manual testing in GHCI is more telling
+    testCase "lst2fkt_la error"    $ assertError "undefiniert" (lst2fkt_la (unLA lab1) (LF Q1 0) == 0),
+    testCase "lst2fkt_so error"    $ assertError "undefiniert" (gPrice (lst2fkt_so (unSort sortf1) (T T1)) == 0),
+    testCase "lst2fkt_ab error ab" $ assertError "undefiniert" (gPrice (((\(Sort x)->x) $ lst2fkt_ab (unMt mf1) H4)(M M1)) == 0),
+    testCase "lst2fkt_ab error so" $ assertError "undefiniert" (gPrice (((\(Sort x)->x) $ lst2fkt_ab (unMt mf2) H6)(T T1)) == 0),
+    testCase "lst2fkt_ab error la" $ assertError "undefiniert" (gStockBy (((\(Sort x)->x) $ lst2fkt_ab (unMt m1) H6)(M M1)) (LF Q1 0) == 0),
 
     testCase "preisanpassung 1" $ (test1 (M M2) . preisanpassung $ pack m1) @?= [H2,H3,H5,H7,H9,H10],
     testCase "preisanpassung 2" $ (test1 (T T1) . preisanpassung $ pack m1) @?= [],
@@ -299,8 +301,7 @@ spec = testGroup "TestSuite7"
     testCase "preisanpassung 8" $ (test4 (S S2) (LF Q1 2025) 3 . preisanpassung $ pack m1) @?= [(H8,EUR 279),(H4,EUR 279)],
     testCase "preisanpassung 9" $ (test4 (S S2) (LF Q4 2025) 14 . preisanpassung $ pack m2) @?= [(H4,EUR 1298)],
 
-    testCase "Ord Lieferfenster 1"  $ LF Q4 2023 < LF Q1 2050 @?= True,
-    testCase "Ord Lieferfenster 2"  $ LF Q4 2025 < LF Q1 2025 @?= False,
+    testCase "Ord Lieferfenster"  $ zipWith compare lList (tail lList) @?= replicate (length lList -1) LT,
 
     testCase "berichtige 1" $ test1 (M M2) (berichtige (Mt. lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [H2,H3,H5,H7,H9,H10],
     testCase "berichtige 2" $ test1 (T T1) (berichtige (Mt. lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [],
@@ -315,11 +316,11 @@ spec = testGroup "TestSuite7"
     -- test requiring Markt' deriving (Eq, Show)
     testCase "length (show m1)" $ length (show m1) @?= 67862,
     testCase "length (show m2)" $ length (show m2) @?= 67867,
-    testCase "Eq Markt True'"   $ m1 == m1 @?= True,
-    testCase "Eq Markt False'"  $ m1 == m2 @?= False,
+    testCase "Eq Markt True"    $ m1 == m1 @?= True,
+    testCase "Eq Markt False"   $ m1 == m2 @?= False,
 
 
-    testCase "errors checks not included" $ True @?= True
+    testCase "" $ True @?= True
     ]
 
 
@@ -331,8 +332,6 @@ lList :: [Lieferfenster]
 lList = [LF Q1 2023,LF Q2 2023,LF Q3 2023,LF Q4 2023
         ,LF Q1 2024,LF Q2 2024,LF Q3 2024,LF Q4 2024
         ,LF Q1 2025,LF Q2 2025,LF Q3 2025,LF Q4 2025]
-lListf :: [Lieferfenster]
-lListf = repeat (LF Q1 2023)
 
 toData :: Typ -> Markt -> [(Haendler, Datensatz)]
 toData typ (Mt m) = [(a,(\(Sort x) -> x typ) (m a)) | a <- hList]
@@ -383,9 +382,6 @@ test4 t l n = sortBy (comparing $ Down . fst)
 
 fkt2lst_la :: (Lieferfenster -> Nat0) -> [(Lieferfenster,Nat0)]
 fkt2lst_la y = map (\x -> (x,y x)) lList
-
-fkt2lst_la_f :: (Lieferfenster -> Nat0) -> [(Lieferfenster,Nat0)]
-fkt2lst_la_f y = map (\x -> (x,y x)) lListf
 
 fkt2lst_so :: (Typ -> Datensatz) -> [(Typ,Datensatz')]
 fkt2lst_so y = map (\x -> (x,(\case

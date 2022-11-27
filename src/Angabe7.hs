@@ -57,8 +57,8 @@ instance Enum Typ where
       limit2 = 1 + fromEnum (maxBound :: Waeschetrockner) + limit1
   fromEnum :: Typ -> Int
   fromEnum (M x) = fromEnum x
-  fromEnum (T x) = fromEnum x + fromEnum (maxBound :: Waschmaschine) + 1
-  fromEnum (S x) = fromEnum x + fromEnum (maxBound :: Waschmaschine) + fromEnum (maxBound :: Waeschetrockner) + 2
+  fromEnum (T x) = fromEnum x + 1 + fromEnum (M (maxBound :: Waschmaschine))
+  fromEnum (S x) = fromEnum x + 1 + fromEnum (T (maxBound :: Waeschetrockner))
 
 instance Bounded Typ where
   minBound :: Typ
@@ -83,11 +83,10 @@ instance Ord Lieferfenster where
 
 instance Enum Lieferfenster where
   toEnum :: Int -> Lieferfenster
-  toEnum n = LF (toEnum (mod n 4)) (toEnum (div n 4))
+  toEnum n = LF (toEnum (mod n 4)) (2023 + div n 4)
 
   fromEnum :: Lieferfenster -> Int
-  fromEnum (LF q y) = fromEnum y * 4 + fromEnum q
-
+  fromEnum (LF q y) = (y-2023) * 4 + fromEnum q
 
 data Datensatz
    = DS { preis_in_euro                        :: Nat1,
@@ -118,22 +117,6 @@ newtype Betroffene_Haendler = BH (Haendler -> Betroffen)
 
 type AbLieferfenster = Lieferfenster
 
-
--- lList :: [Lieferfenster]
--- lList = [minBound .. maxBound]
-
-tList :: [Typ]
-tList = [minBound .. maxBound]
-
-hList :: [Haendler]
-hList = [minBound .. maxBound]
-
-lList :: [Lieferfenster]
-lList = [LF a b|  b <- [2023..],a <- [minBound..maxBound]]
-
-
-
-
 newtype Lieferausblick  = LA (Lieferfenster -> Nat0)
 newtype Lieferausblick' = LA' [(Lieferfenster,Nat0)]
   deriving (Eq, Ord, Show)
@@ -149,17 +132,14 @@ newtype Markt' = Mt' [(Haendler,Sortiment')]
 -- Aufgabe A.1
 
 lst2fkt_la :: [(Lieferfenster,Nat0)] -> (Lieferfenster -> Nat0)
-lst2fkt_la x k = (\case Just a -> a
-                        _      -> error "undefiniert") $ lookup k x
+lst2fkt_la = lst2fkt id
 
 lst2fkt_so :: [(Typ,Datensatz')] -> (Typ -> Datensatz)
-lst2fkt_so x k = (\case Just (DS' a b c d) -> DS a b (lst2fkt_la' c) d
-                        _                  -> error "undefiniert") $ lookup k x
+lst2fkt_so = lst2fkt (\case (DS' a b c d) -> DS a b (lst2fkt_la' c) d
+                            _             -> error "undefiniert")
 
 lst2fkt_ab :: [(Haendler,Sortiment')] -> (Haendler -> Sortiment)
-lst2fkt_ab x k = (\case Just a -> lst2fkt_so' a
-                        _      -> error "undefiniert") $ lookup k x
-
+lst2fkt_ab = lst2fkt lst2fkt_so'
 
 -- Aufgabe A.2
 
@@ -172,39 +152,33 @@ lst2fkt_so' (Sort' x) = Sort $ lst2fkt_so x
 lst2fkt_ab' :: Markt' -> Markt
 lst2fkt_ab' (Mt' x) = Mt $ lst2fkt_ab x
 
-
-
-
-
 -- Aufgabe A.4
 
 preisanpassung :: Markt -> Markt
 preisanpassung markt =
-  reconM
+    reconM
   . map (second
   $ map (\(x,y)->
     let v = lookup x minPriceList
     in case v of
-    Nothing -> (x,y)
-    Just z  -> (x, sPrice y z)))
+      Nothing -> (x,y)
+      Just z  -> (x, sPrice y z)))
   . deconM
   $ markt
 
   where
     minPriceList :: [(Typ,Nat1)]
-    minPriceList = mapMaybe
-                  (getMins 
+    minPriceList = mapMaybe (getMins
                   [(n1, gPrice n2) | (_,m2) <- deconM markt
                                    , (n1,n2) <- m2
-                                   , 0 < gStock n2
+                                  --  , 0 < gStock n2
                   ]) tList
 
     getMins :: [(Typ,Nat1)] -> Typ -> Maybe (Typ,Nat1)
-    getMins l t = let trimmed = map snd . filter ((==t) . fst) $ l
-                   in case trimmed of
+    getMins l t = let specific = map snd . filter ((==t) . fst) $ l
+                   in case specific of
                       x:xs -> Just (t,foldl min x xs)
                       _    -> Nothing
-
 
 -- Aufgabe A.5
 
@@ -218,11 +192,34 @@ berichtige markt (BH bh) al =
   . deconM
   $ markt
 
+-- new structure because the default sucks
+lst2fkt :: Eq a => (t -> b) -> [(a, t)] -> a -> b
+lst2fkt f a b = (\case Just x -> f x
+                       _      -> error "undefiniert") $ lookup b a
+
+deconM :: Markt -> [(Haendler, [(Typ, Datensatz)])]
+deconM (Mt x) = map (\a->(a,deconS$ x a)) hList
+
+reconM :: [(Haendler, [(Typ, Datensatz)])] -> Markt
+reconM = Mt . lst2fkt id . map (second reconS)
+
+deconS :: Sortiment -> [(Typ, Datensatz)]
+deconS (Sort x) = map (\a->(a,x a)) tList
+
+reconS :: [(Typ, Datensatz)] -> Sortiment
+reconS = Sort . lst2fkt id
+
+-- lists
+tList :: [Typ]
+tList = [minBound .. maxBound]
+
+hList :: [Haendler]
+hList = [minBound .. maxBound]
+
+lList :: [Lieferfenster]
+lList = [LF a b|  b <- [2023..],a <- [minBound..maxBound]]
 
 -- helper functions
-
-toData :: Typ -> Markt -> [(Haendler, Datensatz)]
-toData typ (Mt m) = map (second (\(Sort x) -> x typ) . \x-> (x,m x)) hList
 
 gPrice :: Datensatz -> Nat1
 gPrice (DS x _ _ _) = x
@@ -232,60 +229,14 @@ sPrice :: Datensatz -> Nat1 -> Datensatz
 sPrice (DS _ b c d) a = DS a b c d
 sPrice _ _            = Nicht_im_Sortiment
 
-gPriceRed :: Datensatz -> Double
-gPriceRed (DS x _ _ DreiProzent)  = fromIntegral x * 0.97
-gPriceRed (DS x _ _ FuenfProzent) = fromIntegral x * 0.95
-gPriceRed (DS x _ _ ZehnProzent)  = fromIntegral x * 0.9
-gPriceRed (DS x _ _ _)            = fromIntegral x
-gPriceRed _                       = 0
-
 gStock :: Datensatz -> Nat0
 gStock (DS _ x _ _) = x
 gStock _            = 0
-
-gLA :: Datensatz -> Lieferausblick
-gLA (DS _ _ x _) = x
-gLA _            = LA $ const 0
-
-gStockBy :: Datensatz -> Lieferfenster -> Nat0
-gStockBy (DS _ _ (LA x) _) = x
-gStockBy _                 = const 0
 
 noStockFrom :: Datensatz -> Lieferfenster -> Datensatz
 noStockFrom (DS a b (LA c) d) t = DS a b (LA (\x-> if x<t then c x else 0)) d
 noStockFrom _ _                 = Nicht_im_Sortiment
 
-getSkonto :: Datensatz -> Skonto
-getSkonto (DS _ _ _ x) = x
-getSkonto _            = Kein_Skonto
-
-
-
---new structure because the default sucks
-
-deconS :: Sortiment -> [(Typ, Datensatz)]
-deconS (Sort x) = map (\a->(a,x a)) tList
-
-deconM :: Markt -> [(Haendler, [(Typ, Datensatz)])]
-deconM (Mt x) = map (\a->(a,deconS$ x a)) hList
-
-reconS :: [(Typ,Datensatz)] -> Sortiment
-reconS = Sort . getFun
-  where
-    getFun :: [(Typ,Datensatz)] -> (Typ -> Datensatz)
-    getFun ((x,y):xs) r
-      | x==r = y
-      | otherwise = getFun xs r
-    getFun _ _ = Nicht_im_Sortiment
-
-reconM :: [(Haendler, [(Typ, Datensatz)])] -> Markt
-reconM = Mt . getFun . map (second reconS)
-  where
-    getFun :: [(Haendler, Sortiment)] -> (Haendler -> Sortiment)
-    getFun ((x,y):xs) r
-      | x==r = y
-      | otherwise = getFun xs r
-    getFun _ _ = Sort $ const Nicht_im_Sortiment
 
 
 

@@ -31,7 +31,7 @@ import           Angabe7           (AbLieferfenster, Betroffen (..),
                                     Waschmaschine (..), berichtige, lst2fkt_ab,
                                     lst2fkt_la, lst2fkt_so, preisanpassung)
 import           Test.HUnit        (Test, Testable (test), assertFailure,
-                                    runTestTTAndExit, (@?=), (~:))
+                                    runTestTTAndExit, (@?=), (~:), (~?=))
 import           Control.Exception (ErrorCall (ErrorCallWithLocation), evaluate,
                                     try)
 import           Data.Ord          (Down (Down), comparing)
@@ -113,7 +113,8 @@ sort4 = Sort' [(M M1,ds0),(M M2,ds0),(M M3,ds3),(M M4,ds5),(M M5,ds5),(T T1,ds0)
 sort5 = Sort' [(M M1,ds0),(M M2,ds2),(M M3,ds2),(M M4,ds4),(M M5,ds1),(T T1,ds0)
               ,(T T2,ds5),(T T3,ds2),(T T4,ds2),(S S1,ds0),(S S2,ds0),(S S3,ds2)]
 
-sortf1 = Sort' [(M M5, ds0), (M M1, ds0), (M M5, ds0)]
+sortf1= Sort' [(M M1,ds0),(M M2,ds2),(M M3,ds2),(M M4,ds4),(M M5,ds1)
+              ,(T T2,ds5),(T T3,ds2),(T T4,ds2),(S S1,ds0),(S S2,ds0),(S S3,ds2)]
 
 ds0, ds1, ds2, ds3, ds4, ds5 :: Datensatz'
 ds0 = DS' 100000000 0 lab0 Kein_Skonto
@@ -250,11 +251,14 @@ spec =
     "lst2fkt_so" ~: (sort.map fst.fkt2lst_so.lst2fkt_so.unSort) sort1 @?= (sort.map fst.unSort) sort1,
     "lst2fkt_ab" ~: (sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt) m1 @?= (sort.map fst.unMt ) m1,
 
-    -- can't get them to work somehow
-    -- testCase "lst2fkt_la error" $ assertError "undefiniert" (length.sort.fkt2lst_la_f.lst2fkt_la.fkt2lst_la_f.lst2fkt_la.unLA $ labf),
-    -- testCase "lst2fkt_so error" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_so.lst2fkt_so.unSort $ sortf1),
-    -- testCase "lst2fkt_ab error 1" $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf1),
-    -- "lst2fkt_ab error 2" ~: TestCase $ assertError "undefiniert" (length.sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt $ mf2),
+    -- there's a chance these malfunction depending on platform
+    -- manual testing in GHCI is more telling
+
+    "lst2fkt_la error"    ~: assertError "undefiniert" (lst2fkt_la (unLA lab1) (LF Q1 0) == 0),
+    "lst2fkt_so error"    ~: assertError "undefiniert" (gPrice (lst2fkt_so (unSort sortf1) (T T1)) == 0),
+    "lst2fkt_ab error ab" ~: assertError "undefiniert" (gPrice (((\(Sort x)->x) $ lst2fkt_ab (unMt mf1) H4)(M M1)) == 0),
+    "lst2fkt_ab error so" ~: assertError "undefiniert" (gPrice (((\(Sort x)->x) $ lst2fkt_ab (unMt mf2) H6)(T T1)) == 0),
+    "lst2fkt_ab error la" ~: assertError "undefiniert" (gStockBy (((\(Sort x)->x) $ lst2fkt_ab (unMt m1) H6)(M M1)) (LF Q1 0) == 0),
 
     "preisanpassung 1" ~: (test1 (M M2) . preisanpassung $ pack m1) @?= [H2,H3,H5,H7,H9,H10],
     "preisanpassung 2" ~: (test1 (T T1) . preisanpassung $ pack m1) @?= [],
@@ -266,8 +270,7 @@ spec =
     "preisanpassung 8" ~: (test4 (S S2) (LF Q1 2025) 3 . preisanpassung $ pack m1) @?= [(H8,EUR 279),(H4,EUR 279)],
     "preisanpassung 9" ~: (test4 (S S2) (LF Q4 2025) 14 . preisanpassung $ pack m2) @?= [(H4,EUR 1298)],
 
-    "Ord Lieferfenster 1" ~: LF Q4 2023 < LF Q1 2050 @?= True,
-    "Ord Lieferfenster 2" ~: LF Q4 2025 < LF Q1 2025 @?= False,
+    "Ord Lieferfenster" ~: zipWith compare lList (tail lList) @?= replicate (length lList -1) LT,
 
     "berichtige 1" ~: test1 (M M2) (berichtige (Mt. lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [H2,H3,H5,H7,H9,H10],
     "berichtige 2" ~: test1 (T T1) (berichtige (Mt. lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [],
@@ -279,14 +282,13 @@ spec =
     "berichtige 8" ~: test4 (S S2) (LF Q1 2025) 3  (berichtige (pack m1)bh1(LF Q1 2024)) @?= [(H8,EUR 543)],
     "berichtige 9" ~: test4 (S S2) (LF Q1 2025) 14 (berichtige (pack m2)bh1(LF Q1 2024)) @?= [],
 
-    -- test requiring Markt' deriving (Eq, Show)
-
+    -- tests requiring Markt' deriving (Eq, Show)
     "length (show m1)" ~: length (show m1) @?= 67862,
     "length (show m2)" ~: length (show m2) @?= 67867,
     "Eq Markt' True"   ~: m1 == m1 @?= True,
     "Eq Markt' False"  ~: m1 == m2 @?= False,
 
-    "errors checks not included" ~: True @?= True
+    True ~?= True
     ]
 
 
@@ -298,8 +300,7 @@ lList :: [Lieferfenster]
 lList = [LF Q1 2023,LF Q2 2023,LF Q3 2023,LF Q4 2023
         ,LF Q1 2024,LF Q2 2024,LF Q3 2024,LF Q4 2024
         ,LF Q1 2025,LF Q2 2025,LF Q3 2025,LF Q4 2025]
-lListf :: [Lieferfenster]
-lListf = repeat (LF Q1 2023)
+
 
 toData :: Typ -> Markt -> [(Haendler, Datensatz)]
 toData typ (Mt m) = [(a,(\(Sort x) -> x typ) (m a)) | a <- hList]
@@ -351,9 +352,6 @@ test4 t l n = sortBy (comparing $ Down . fst)
 fkt2lst_la :: (Lieferfenster -> Nat0) -> [(Lieferfenster,Nat0)]
 fkt2lst_la y = map (\x -> (x,y x)) lList
 
-fkt2lst_la_f :: (Lieferfenster -> Nat0) -> [(Lieferfenster,Nat0)]
-fkt2lst_la_f y = map (\x -> (x,y x)) lListf
-
 fkt2lst_so :: (Typ -> Datensatz) -> [(Typ,Datensatz')]
 fkt2lst_so y = map (\x -> (x,(\case
                             (DS a b (LA c) d) -> DS' a b (LA' $ fkt2lst_la c) d
@@ -368,6 +366,8 @@ unLA (LA' x) = x
 
 unSort :: Sortiment' -> [(Typ, Datensatz')]
 unSort (Sort' x) = x
+
+
 
 unMt :: Markt' -> [(Haendler, Sortiment')]
 unMt (Mt' x)  = x
