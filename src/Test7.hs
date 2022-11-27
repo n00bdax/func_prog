@@ -116,11 +116,11 @@ sort5 = Sort' [(M M1,ds0),(M M2,ds2),(M M3,ds2),(M M4,ds4),(M M5,ds1),(T T1,ds0)
 sortf1 = Sort' [(M M5, ds0), (M M1, ds0), (M M5, ds0)]
 
 ds0, ds1, ds2, ds3, ds4, ds5 :: Datensatz'
-ds0 = DS' 0 0 lab0 Kein_Skonto
+ds0 = DS' 100000000 0 lab0 Kein_Skonto
 ds1 = DS' 201 2 lab1 ZehnProzent
 ds2 = DS' 103 3 lab2 FuenfProzent
 ds3 = DS' 99 4 lab3 FuenfProzent
-ds4 = DS' 102 0 lab4 DreiProzent
+ds4 = DS' 104 0 lab4 DreiProzent
 ds5 = DS' 99 6 lab5 Kein_Skonto
 
 lab0, lab1, lab2, lab3, lab4, lab5,labf :: Lieferausblick'
@@ -280,8 +280,9 @@ spec =
     "berichtige 9" ~: test4 (S S2) (LF Q1 2025) 14 (berichtige (pack m2)bh1(LF Q1 2024)) @?= [],
 
     -- test requiring Markt' deriving (Eq, Show)
-    "length (show m1)" ~: length (show m1) @?= 67222,
-    "length (show m2)" ~: length (show m2) @?= 67123,
+
+    "length (show m1)" ~: length (show m1) @?= 67862,
+    "length (show m2)" ~: length (show m2) @?= 67867,
     "Eq Markt' True"   ~: m1 == m1 @?= True,
     "Eq Markt' False"  ~: m1 == m2 @?= False,
 

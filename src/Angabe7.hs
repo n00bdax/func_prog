@@ -192,15 +192,12 @@ preisanpassung markt =
 
   where
     minPriceList :: [(Typ,Nat1)]
-    minPriceList =
-      mapMaybe
-      (getMins[(n1, gPrice n2) | (_,m2) <- deconM markt
-                               , (n1,n2) <- m2
-                              --  , h <- hList
-                              --  , h == m1
-                              --  , t <- tList
-                              --  , t == n1
-                               , 0 < gStock n2]) tList
+    minPriceList = mapMaybe
+                  (getMins 
+                  [(n1, gPrice n2) | (_,m2) <- deconM markt
+                                   , (n1,n2) <- m2
+                                   , 0 < gStock n2
+                  ]) tList
 
     getMins :: [(Typ,Nat1)] -> Typ -> Maybe (Typ,Nat1)
     getMins l t = let trimmed = map snd . filter ((==t) . fst) $ l
