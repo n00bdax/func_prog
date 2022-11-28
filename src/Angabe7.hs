@@ -74,12 +74,8 @@ data Lieferfenster = LF { quartal :: Quartal,
   deriving (Eq, Show)
 
 instance Ord Lieferfenster where
-  compare :: Lieferfenster -> Lieferfenster -> Ordering
-  compare (LF a1 a2) (LF b1 b2)
-    | x == EQ = compare a1 b1
-    | otherwise = x
-    where
-      x = compare a2 b2
+  (<=) :: Lieferfenster -> Lieferfenster -> Bool
+  (<=) a b = fromEnum a <= fromEnum b
 
 instance Enum Lieferfenster where
   toEnum :: Int -> Lieferfenster
@@ -217,7 +213,7 @@ hList :: [Haendler]
 hList = [minBound .. maxBound]
 
 lList :: [Lieferfenster]
-lList = [LF a b|  b <- [2023..],a <- [minBound..maxBound]]
+lList = map toEnum [0..399]
 
 -- helper functions
 

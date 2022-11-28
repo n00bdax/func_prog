@@ -247,9 +247,9 @@ spec :: [Test]
 spec =
     [
 
-    "lst2fkt_la" ~: (sort.fkt2lst_la.lst2fkt_la.unLA) lab1 @?= (sort.unLA) lab1,
-    "lst2fkt_so" ~: (sort.map fst.fkt2lst_so.lst2fkt_so.unSort) sort1 @?= (sort.map fst.unSort) sort1,
-    "lst2fkt_ab" ~: (sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt) m1 @?= (sort.map fst.unMt ) m1,
+    "lst2fkt_la" ~: lst2fkt_la (unLA lab1) (LF Q1 2023) @?= 10,
+    "lst2fkt_so" ~: gPrice (lst2fkt_so (unSort sort1) (T T1)) @?= 100000000,
+    "lst2fkt_ab" ~: gPrice (((\(Sort x)->x) $ lst2fkt_ab (unMt m1) H4)(M M1)) @?= 100000000,
 
     -- there's a chance these malfunction depending on platform
     -- manual testing in GHCI is more telling

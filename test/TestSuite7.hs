@@ -279,9 +279,9 @@ spec :: TestTree
 spec = testGroup "TestSuite7"
     [
 
-    testCase "lst2fkt_la"  $ (sort.fkt2lst_la.lst2fkt_la.unLA) lab1 @?= (sort.unLA) lab1,
-    testCase "lst2fkt_so"  $ (sort.map fst.fkt2lst_so.lst2fkt_so.unSort) sort1 @?= (sort.map fst.unSort) sort1,
-    testCase "lst2fkt_ab"  $ (sort.map fst.fkt2lst_ab.lst2fkt_ab.unMt) m1 @?= (sort.map fst.unMt ) m1,
+    testCase "lst2fkt_la"  $ lst2fkt_la (unLA lab1) (LF Q1 2023) @?= 10,
+    testCase "lst2fkt_so"  $ gPrice (lst2fkt_so (unSort sort1) (T T1)) @?= 100000000,
+    testCase "lst2fkt_ab"  $ gPrice (((\(Sort x)->x) $ lst2fkt_ab (unMt m1) H4)(M M1)) @?= 100000000,
 
     -- there's a chance these malfunction depending on platform
     -- manual testing in GHCI is more telling
@@ -303,8 +303,8 @@ spec = testGroup "TestSuite7"
 
     testCase "Ord Lieferfenster"  $ zipWith compare lList (tail lList) @?= replicate (length lList -1) LT,
 
-    testCase "berichtige 1" $ test1 (M M2) (berichtige (Mt. lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [H2,H3,H5,H7,H9,H10],
-    testCase "berichtige 2" $ test1 (T T1) (berichtige (Mt. lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [],
+    testCase "berichtige 1" $ test1 (M M2) (berichtige (Mt . lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [H2,H3,H5,H7,H9,H10],
+    testCase "berichtige 2" $ test1 (T T1) (berichtige (Mt . lst2fkt_ab . unMt $ m1)bh1(LF Q1 2023)) @?= [],
     testCase "berichtige 3" $ test3 (T T1) (LF Q1 2024) (berichtige (pack m1) bh1 (LF Q3 2024)) @?= (0,0),
     testCase "berichtige 4" $ test3 (T T3) (LF Q1 2025) (berichtige (pack m1) bh1 (LF Q2 2024)) @?= (0,0),
     testCase "berichtige 5" $ test3 (M M2) (LF Q1 2024) (berichtige (pack m2) bh2 (LF Q1 2024)) @?= (15,2917),
