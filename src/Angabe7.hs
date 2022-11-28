@@ -194,13 +194,13 @@ lst2fkt f a b = (\case Just x -> f x
                        _      -> error "undefiniert") $ lookup b a
 
 deconM :: Markt -> [(Haendler, [(Typ, Datensatz)])]
-deconM (Mt x) = map (\a->(a,deconS$ x a)) hList
+deconM (Mt x) = [(a,deconS $ x a)|a <- hList]
 
 reconM :: [(Haendler, [(Typ, Datensatz)])] -> Markt
 reconM = Mt . lst2fkt id . map (second reconS)
 
 deconS :: Sortiment -> [(Typ, Datensatz)]
-deconS (Sort x) = map (\a->(a,x a)) tList
+deconS (Sort x) = [(a,x a)|a <- tList]
 
 reconS :: [(Typ, Datensatz)] -> Sortiment
 reconS = Sort . lst2fkt id

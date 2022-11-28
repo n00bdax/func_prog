@@ -367,8 +367,6 @@ unLA (LA' x) = x
 unSort :: Sortiment' -> [(Typ, Datensatz')]
 unSort (Sort' x) = x
 
-
-
 unMt :: Markt' -> [(Haendler, Sortiment')]
 unMt (Mt' x)  = x
 
