@@ -154,7 +154,7 @@ ds0 = DS' 100000000 0 lab0 Kein_Skonto
 ds1 = DS' 201 2 lab1 ZehnProzent
 ds2 = DS' 103 3 lab2 FuenfProzent
 ds3 = DS' 99 4 lab3 FuenfProzent
-ds4 = DS' 104 0 lab4 DreiProzent
+ds4 = DS' 80 0 lab4 DreiProzent
 ds5 = DS' 99 6 lab5 Kein_Skonto
 
 lab0, lab1, lab2, lab3, lab4, lab5,labf :: Lieferausblick'
@@ -294,9 +294,9 @@ spec = testGroup "TestSuite7"
     testCase "preisanpassung 1" $ (test1 (M M2) . preisanpassung $ pack m1) @?= [H2,H3,H5,H7,H9,H10],
     testCase "preisanpassung 2" $ (test1 (T T1) . preisanpassung $ pack m1) @?= [],
     testCase "preisanpassung 3" $ (test2 (T T1) . preisanpassung $ pack m1) @?= (0,0),
-    testCase "preisanpassung 4" $ (test2 (T T3) . preisanpassung $ pack m1) @?= (5,515),
+    testCase "preisanpassung 4" $ (test2 (T T3) . preisanpassung $ pack m1) @?= (5,400),
     testCase "preisanpassung 5" $ (test2 (M M2) . preisanpassung $ pack m2) @?= (7,721),
-    testCase "preisanpassung 6" $ (test2 (M M5) . preisanpassung $ pack m2) @?= (11,1089),
+    testCase "preisanpassung 6" $ (test2 (M M5) . preisanpassung $ pack m2) @?= (11,880),
     testCase "preisanpassung 7" $ (test2 (S S2) . preisanpassung $ pack m2) @?= (8,824),
     testCase "preisanpassung 8" $ (test4 (S S2) (LF Q1 2025) 3 . preisanpassung $ pack m1) @?= [(H8,EUR 279),(H4,EUR 279)],
     testCase "preisanpassung 9" $ (test4 (S S2) (LF Q4 2025) 14 . preisanpassung $ pack m2) @?= [(H4,EUR 1298)],
@@ -314,8 +314,8 @@ spec = testGroup "TestSuite7"
     testCase "berichtige 9" $ test4 (S S2) (LF Q1 2025) 14 (berichtige (pack m2)bh1(LF Q1 2024)) @?= [],
 
     -- test requiring Markt' deriving (Eq, Show)
-    testCase "length (show m1)" $ length (show m1) @?= 67862,
-    testCase "length (show m2)" $ length (show m2) @?= 67867,
+    testCase "length (show m1)" $ length (show m1) @?= 67857,
+    testCase "length (show m2)" $ length (show m2) @?= 67864,
     testCase "Eq Markt True"    $ m1 == m1 @?= True,
     testCase "Eq Markt False"   $ m1 == m2 @?= False,
 

@@ -115,15 +115,19 @@ gewicht z g
   stringDuplicateCheck :: Zeichenreihe -> Bool
   stringDuplicateCheck r
     | length r <= 1 = True
-    | head r `elem` tail r = False
+    | head r ^.^ tail r = False
     | otherwise = stringDuplicateCheck (tail r)
 
   registerDuplicateCheck :: Gewichtsverzeichnis -> Bool
   registerDuplicateCheck r = stringDuplicateCheck[fst x | x <- r ]
 
 
+infixr 5 ^.^
 
-
+( ^.^ ) :: (Foldable t, Eq a) => a -> t a -> Bool
+( ^.^ ) = elem
+(*.*) :: Int -> Int -> Int
+(*.*) a b = a*b-a-b
 
 
 {- Knapp, aber gut nachvollziehbar geht gewicht folgendermassen vor:
