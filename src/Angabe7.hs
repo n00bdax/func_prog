@@ -6,6 +6,7 @@
 module Angabe7 where
 import           Data.Bifunctor
 import           Data.Maybe
+import Control.Applicative
 
 
 {- 1. Vervollstaendigen Sie gemaess Angabentext!
@@ -131,8 +132,12 @@ lst2fkt_la :: [(Lieferfenster,Nat0)] -> (Lieferfenster -> Nat0)
 lst2fkt_la = lst2fkt id
 
 lst2fkt_so :: [(Typ,Datensatz')] -> (Typ -> Datensatz)
-lst2fkt_so = lst2fkt (\case (DS' a b c d) -> DS a b (lst2fkt_la' c) d
-                            _             -> error "unvollständiger Datensatz")
+lst2fkt_so = lst2fkt $ \case (DS' a b c d) -> DS a b (lst2fkt_la' c) d
+                             _             -> error "unvollständiger Datensatz"
+
+dsSwap :: Datensatz' -> Datensatz
+dsSwap (DS' a b c d) = DS a b (lst2fkt_la' c) d
+dsSwap _             = Nicht_im_Sortiment
 
 lst2fkt_ab :: [(Haendler,Sortiment')] -> (Haendler -> Sortiment)
 lst2fkt_ab = lst2fkt lst2fkt_so'
@@ -150,17 +155,17 @@ lst2fkt_ab' (Mt' x) = Mt $ lst2fkt_ab x
 
 -- Aufgabe A.4
 
+
 preisanpassung :: Markt -> Markt
 preisanpassung markt =
     reconM
-  . map (second
-  $ map (\(x,y)->
+  $ second
+  ((\(x,y)->
     let v = lookup x minPriceList
     in case v of
       Nothing -> (x,y)
-      Just z  -> (x, sPrice y z)))
-  . deconM
-  $ markt
+      Just z  -> (x, sPrice y z)) <$>)
+  <$> deconM markt
 
   where
     minPriceList :: [(Typ,Nat1)]
@@ -181,26 +186,30 @@ preisanpassung markt =
 berichtige :: Markt -> Betroffene_Haendler -> AbLieferfenster -> Markt
 berichtige markt (BH bh) al =
   reconM
-  . map (\(a,b)->
+  $ (\(a,b)->
       if bh a == Betroffen
       then (a,map (\(c,d) -> (c,noStockFrom d al)) b)
       else (a,b))
-  . deconM
-  $ markt
+  <$> deconM
+   markt
+
+  where
+    noStockFrom :: Datensatz -> Lieferfenster -> Datensatz
+    noStockFrom (DS a b (LA c) d) t = DS a b (LA (\x-> if x<t then c x else 0)) d
+    noStockFrom _ _                 = Nicht_im_Sortiment
 
 -- new structure because the default sucks
-lst2fkt :: Eq a => (t -> b) -> [(a, t)] -> a -> b
-lst2fkt f a b = (\case Just x -> f x
-                       _      -> error "undefiniert") $ lookup b a
 
 deconM :: Markt -> [(Haendler, [(Typ, Datensatz)])]
-deconM (Mt x) = map (\a->(a,deconS$ x a)) hList
+deconM (Mt x) = (\a->(a,deconS $ x a)) <$> hList
+-- deconM (Mt x) = [(a,deconS $ x a)|a <- hList]
 
 reconM :: [(Haendler, [(Typ, Datensatz)])] -> Markt
 reconM = Mt . lst2fkt id . map (second reconS)
 
 deconS :: Sortiment -> [(Typ, Datensatz)]
-deconS (Sort x) = map (\a->(a,x a)) tList
+deconS (Sort x) = (\a -> (a,x a)) <$> tList
+-- deconS (Sort x) = [(a,x a)|a <- tList]
 
 reconS :: [(Typ, Datensatz)] -> Sortiment
 reconS = Sort . lst2fkt id
@@ -213,9 +222,16 @@ hList :: [Haendler]
 hList = [minBound .. maxBound]
 
 lList :: [Lieferfenster]
-lList = map toEnum [0..399]
+lList = enumFromTo (LF Q1 2023) (LF Q1 2033)
 
 -- helper functions
+
+lst2fkt :: Eq a => (t -> b) -> [(a, t)] -> a -> b
+lst2fkt f a b = case lookup b a
+                  of Just x -> f x
+                     _      -> error "undefiniert"
+
+-- lst2fkt f a b = f . fromJust $ lookup b a <|> error "undefiniert"
 
 gPrice :: Datensatz -> Maybe Nat1
 gPrice (DS x _ _ _) = Just x
@@ -229,9 +245,7 @@ gStock :: Datensatz -> Nat0
 gStock (DS _ x _ _) = x
 gStock _            = 0
 
-noStockFrom :: Datensatz -> Lieferfenster -> Datensatz
-noStockFrom (DS a b (LA c) d) t = DS a b (LA (\x-> if x<t then c x else 0)) d
-noStockFrom _ _                 = Nicht_im_Sortiment
+
 
 
 

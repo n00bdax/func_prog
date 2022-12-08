@@ -19,7 +19,7 @@ import Test.Tasty
 -- import qualified TestSuite6
 --import qualified Angabe6_TestSuite
 import qualified TestSuite7
---import qualified Angabe7_TestSuite
+import qualified Angabe7_TestSuite
 
 main :: IO ()
 main = defaultMain tests
@@ -39,6 +39,6 @@ tests = testGroup "Fprog Tests"
     -- Angabe5_TestSuite.spec,
     -- TestSuite6.spec
     -- Angabe6_TestSuite.spec
-    TestSuite7.spec
-    -- ,Angabe7_TestSuite.spec
+     TestSuite7.spec
+    ,Angabe7_TestSuite.spec
     ]

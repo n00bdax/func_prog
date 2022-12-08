@@ -290,3 +290,32 @@ unwrap2 :: Sortiment -> [(Typ, Datensatz)]
 unwrap2 = \(Sort x) -> x
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
