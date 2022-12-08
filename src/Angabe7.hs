@@ -170,8 +170,9 @@ preisanpassung markt =
   where
     minPriceList :: [(Typ,Nat1)]
     minPriceList = mapMaybe (getMins
-                  [(n1, gPrice n2) | (_,m2) <- deconM markt
+                  [(n1, fromJust $ gPrice n2) | (_,m2) <- deconM markt
                                    , (n1,n2) <- m2
+                                   , isJust $ gPrice n2
                   ]) tList
 
     getMins :: [(Typ,Nat1)] -> Typ -> Maybe (Typ,Nat1)
@@ -232,9 +233,9 @@ lst2fkt :: Eq a => (t -> b) -> [(a, t)] -> a -> b
 
 lst2fkt f a b = f . fromJust $ lookup b a <|> error "undefiniert"
 
-gPrice :: Datensatz -> Nat1
-gPrice (DS x _ _ _) = x
-gPrice _            = 0
+gPrice :: Datensatz -> Maybe Nat1
+gPrice (DS x _ _ _) = Just x
+gPrice _            = Nothing
 
 sPrice :: Datensatz -> Nat1 -> Datensatz
 sPrice (DS _ b c d) a = DS a b c d
