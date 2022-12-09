@@ -226,12 +226,13 @@ lList = enumFromTo (LF Q1 2023) (LF Q1 2033)
 
 -- helper functions
 
+
 lst2fkt :: Eq a => (t -> b) -> [(a, t)] -> a -> b
 lst2fkt f a b = case lookup b a
                   of Just x -> f x
                      _      -> error "undefiniert"
 
--- lst2fkt f a b = f . fromJust $ lookup b a <|> error "undefiniert"
+-- lst2fkt f a b = f $ fromMaybe (error "undefiniert") (lookup b a) -- this changes the error message somehow?
 
 gPrice :: Datensatz -> Maybe Nat1
 gPrice (DS x _ _ _) = Just x
